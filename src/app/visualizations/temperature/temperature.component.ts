@@ -44,6 +44,8 @@ export class TemperatureComponent implements OnInit {
 
   selectedYear: string;
   selectedData: any = [];
+  months: string[] = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
 
   constructor(element: ElementRef, private ngZone: NgZone, d3Service: D3Service, private http: Http) {
     this.d3 = d3Service.getD3();
@@ -75,12 +77,16 @@ export class TemperatureComponent implements OnInit {
             this.data = d3.nest()
             .key(function(d) { return d['year']; })
             .key(function(d) { return d['month']; })
-            .rollup(function(v) { return {
-              avg: d3.mean(v, function(d) { return +d['temperature']; })
-            }; })
-            .entries(raw);
+            .rollup(function(v) {
+              // Compile workaround for Angular2+
+              let values: any = {};
+              values = {
+                avg: d3.mean(v, function(d) { return +d['temperature']; })
+              };
 
-            console.log(this.data)
+              return values;
+            })
+            .entries(raw);
 
             this.max = d3.max(this.data, function(d) {
               return d3.max(d['values'], function(dx) {
@@ -106,9 +112,9 @@ export class TemperatureComponent implements OnInit {
             this.svg.append("g")
               .attr("class", "chart-axis")
               .attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")")
-              .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat(function(d) {
-                let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-                return months[(d - 1)];
+              .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat((d, data) => {
+                console.log(this.months)
+                return this.months[+d - 1]
               }));
 
             this.svg.append("g")
