@@ -9,8 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico",
-        { "glob": "meteo.csv", "input": "./", "output": "./assets/" }
+        "favicon.ico"
       ],
       "index": "index.html",
       "main": "main.ts",
