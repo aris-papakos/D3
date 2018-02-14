@@ -108,7 +108,7 @@ export class TemperatureComponent implements OnInit {
               .attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")")
               .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat(function(d) {
                 let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-                return months[d - 1];
+                return months[(d - 1)];
               }));
 
             this.svg.append("g")
@@ -119,11 +119,7 @@ export class TemperatureComponent implements OnInit {
             this.svg.append("g")
              .attr("class", "chart-grid")
              .attr('transform', 'translate(' + this.margin.left + ', 0)')
-             .call(d3.axisLeft(this.yScale)
-               .ticks(12)
-               .tickSize(-(this.width - this.margin.left  - this.margin.right))
-               .tickFormat("")
-             );
+             .call(d3.axisLeft(this.yScale).ticks(12).tickSize(-(this.width - this.margin.left  - this.margin.right)));
 
             // Initialize the graph with the first year
             this.selectedYear = '2011';
@@ -131,7 +127,7 @@ export class TemperatureComponent implements OnInit {
 
             // Create bars with individual classes, needed for transitions
             for (let i = 0; i< this.selectedData['values'].length; i++) {
-              var data = this.selectedData['values'][i];
+              let data = this.selectedData['values'][i];
 
               this.svg.append("rect")
                 .attr("class", function() {
@@ -147,16 +143,16 @@ export class TemperatureComponent implements OnInit {
                 .attr("y", this.yScale(data['value']['avg']))
                 .attr("height", this.height - this.margin.top - this.margin.bottom - this.yScale(data['value']['avg']))
                 .on("mouseover", (data) => {
-                  let data = this.selectedData['values'][i];
+                  let values = this.selectedData['values'][i];
                   let columnWidth = ((this.width - this.margin.left - this.margin.right) / this.selectedData['values'].length) / 2
 
                   this.svg.append("text")
                     .attr("class", "chart-tooltip")
-                    .attr("x", this.xScale(+data['key']) + columnWidth)
-                    .attr("y", this.yScale(+data['value']['avg']))
+                    .attr("x", this.xScale(+values['key']) + columnWidth)
+                    .attr("y", this.yScale(+values['value']['avg']))
                     .style("font-size", "12px")
                     .style("fill", "rgba(0, 0, 0, 0.48)")
-                    .text(data['value']['avg'].toFixed(1))
+                    .text(values['value']['avg'].toFixed(1))
                     .attr("text-anchor", "middle");
 
                 })
