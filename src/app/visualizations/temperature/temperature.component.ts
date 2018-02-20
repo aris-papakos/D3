@@ -18,7 +18,8 @@ import {
   selector: 'app-temperature',
   host: {
     '(document:keydown.arrowLeft)': 'onKeyArrowLeft($event)',
-    '(document:keydown.arrowRight)': 'onKeyArrowRight($event)'
+    '(document:keydown.arrowRight)': 'onKeyArrowRight($event)',
+    '(window:resize)': 'onResize($event)'
   },
   encapsulation: ViewEncapsulation.None,
   templateUrl: './temperature.component.html',
@@ -60,7 +61,8 @@ export class TemperatureComponent implements OnInit {
     let self = this;
     let d3 = this.d3;
     let d3ParentElement: any;
-    let margin = this.margin = {top: 20, right: 20, bottom: 40, left: 40};
+
+    this.margin = {top: 20, right: 20, bottom: 40, left: 40};
 
     if (this.parentNativeElement !== null) {
       var parent = this.parentNativeElement.querySelector('.chart');
@@ -104,69 +106,11 @@ export class TemperatureComponent implements OnInit {
 
             this.groupWidth = (this.max - this.min) / 4;
 
-            // Set the axes
-            this.xScale = d3.scaleBand().domain(
-              this['data'][0]['values'].map(function(d) { return +d.key; })
-            ).range([this.margin.left, this.width - this.margin.right]),
-            this.yScale = d3.scaleLinear().domain([0, (this.max * 1.1)]).rangeRound([this.height - this.margin.bottom, this.margin.top]);
-
-            // Draw Axes
-            this.svg.append("g")
-              .attr("class", "chart-axis")
-              .attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")")
-              .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat((d, data) => {
-                return this.months[+d - 1]
-              }));
-
-            // this.svg.append("g")
-            //  .attr("class", "chart-axis")
-            //  .attr('transform', 'translate(' + this.margin.left + ', 0)')
-            //  .call(d3.axisLeft(this.yScale).tickSize(0));
-
-            this.svg.append("g")
-             .attr("class", "chart-grid")
-             .attr('transform', 'translate(' + this.margin.left + ', 0)')
-             .call(d3.axisLeft(this.yScale).ticks(12).tickSize(-(this.width - this.margin.left  - this.margin.right)));
-
             // Initialize the graph with the first year
             this.selectedYear = '2011';
             this.selectedData = this.data[0];
 
-            // Create bars with individual classes, needed for transitions
-            for (let i = 0; i< this.selectedData['values'].length; i++) {
-              let data = this.selectedData['values'][i];
-
-              this.svg.append("rect")
-                .attr("class", function() {
-                  return 'chart-bar bar' + i
-                })
-                // .attr("transform", "translate(0," + this.margin.top + ")")
-                .attr("x", this.xScale(+data['key']))
-                .attr("width", this.xScale.bandwidth())
-                .attr("y", this.yScale(data['value']['avg']))
-                .attr("height", this.height - this.margin.bottom - this.yScale(data['value']['avg']))
-                .attr("fill",
-                  'rgba(192, 57, 43,'+ (0.10 * (data['value']['avg'] / this.groupWidth) + 0.10) + ')'
-                )
-                .on("mouseover", (data) => {
-                  let values = this.selectedData['values'][i];
-                  let columnWidth = ((this.width - this.margin.left - this.margin.right) / this.selectedData['values'].length) / 2
-
-                  this.svg.append("text")
-                    .attr("class", "chart-tooltip")
-                    .attr("x", this.xScale(+values['key']) + columnWidth)
-                    .attr("y", this.yScale(+values['value']['avg']))
-                    .style("font-size", "12px")
-                    .style("fill", "rgb(0, 0, 0)")
-                    .text(values['value']['avg'].toFixed(1))
-                    .attr("text-anchor", "middle");
-
-                })
-                .on("mouseout", (data) => {
-                  // Remove previous text
-                  this.d3.selectAll(".chart-tooltip").remove();
-                });
-            }
+            this.renderGraph();
         });
       }
     }
@@ -195,6 +139,80 @@ export class TemperatureComponent implements OnInit {
       }
     }
 
+    onResize(event) {
+      var parent = this.parentNativeElement.querySelector('.chart');
+      this.width = parent.offsetWidth;
+
+      this.svg = this.d3.select('svg')
+        .attr('width', this.width);
+
+      this.renderGraph();
+    }
+
+    renderGraph() {
+      let self = this;
+      let d3 = this.d3;
+      let d3ParentElement: any;
+
+      this.svg = this.d3.select('svg');
+      this.svg.selectAll('*').remove();
+
+
+      // Set the axes
+      this.xScale = d3.scaleBand().domain(
+        this['data'][0]['values'].map(function(d) { return +d.key; })
+      ).range([this.margin.left, this.width - this.margin.right]),
+      this.yScale = d3.scaleLinear().domain([0, (this.max * 1.1)]).rangeRound([this.height - this.margin.bottom, this.margin.top]);
+
+      // Draw Axes
+      this.svg.append("g")
+        .attr("class", "chart-axis")
+        .attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")")
+        .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat((d, data) => {
+          return this.months[+d - 1]
+        }));
+
+      this.svg.append("g")
+       .attr("class", "chart-grid")
+       .attr('transform', 'translate(' + this.margin.left + ', 0)')
+       .call(d3.axisLeft(this.yScale).ticks(12).tickSize(-(this.width - this.margin.left  - this.margin.right)));
+
+      // Create bars with individual classes, needed for transitions
+      for (let i = 0; i< this.selectedData['values'].length; i++) {
+        let data = this.selectedData['values'][i];
+
+        this.svg.append("rect")
+          .attr("class", function() {
+            return 'chart-bar bar' + i
+          })
+          .attr("x", this.xScale(+data['key']))
+          .attr("width", this.xScale.bandwidth())
+          .attr("y", this.yScale(data['value']['avg']))
+          .attr("height", this.height - this.margin.bottom - this.yScale(data['value']['avg']))
+          .attr("fill",
+            'rgba(192, 57, 43,'+ (0.10 * (data['value']['avg'] / this.groupWidth) + 0.10) + ')'
+          )
+          .on("mouseover", (data) => {
+            let values = this.selectedData['values'][i];
+            let columnWidth = ((this.width - this.margin.left - this.margin.right) / this.selectedData['values'].length) / 2
+
+            this.svg.append("text")
+              .attr("class", "chart-tooltip")
+              .attr("x", this.xScale(+values['key']) + columnWidth)
+              .attr("y", this.yScale(+values['value']['avg']) - 10)
+              .style("font-size", "12px")
+              .style("fill", "rgb(0, 0, 0)")
+              .text(values['value']['avg'].toFixed(1))
+              .attr("text-anchor", "middle");
+
+          })
+          .on("mouseout", (data) => {
+            // Remove previous text
+            this.d3.selectAll(".chart-tooltip").remove();
+          });
+      }
+    }
+
     renderData(year): void {
       this.selectedYear = year['key'];
       this.selectedData = year;
@@ -206,7 +224,7 @@ export class TemperatureComponent implements OnInit {
       let height = this.height;
       let groupWidth = this.groupWidth;
 
-      let svg = this.d3.select('.chart').transition()
+      let svg = this.d3.select('.chart').transition();
 
       for (let i = 0; i< this.selectedData['values'].length; i++) {
         let data = this.selectedData['values'][i];
