@@ -16,6 +16,10 @@ import {
 
 @Component({
   selector: 'app-temperature',
+  host: {
+    '(document:keydown.arrowLeft)': 'onKeyArrowLeft($event)',
+    '(document:keydown.arrowRight)': 'onKeyArrowRight($event)'
+  },
   encapsulation: ViewEncapsulation.None,
   templateUrl: './temperature.component.html',
   styleUrls: ['./temperature.component.css']
@@ -56,18 +60,16 @@ export class TemperatureComponent implements OnInit {
     let self = this;
     let d3 = this.d3;
     let d3ParentElement: any;
+    let margin = this.margin = {top: 20, right: 20, bottom: 40, left: 40};
 
     if (this.parentNativeElement !== null) {
-      // let parent = d3.select('chart');
       var parent = this.parentNativeElement.querySelector('.chart');
-      this.width = parent.offsetWidth / 2;
+      this.width = parent.offsetWidth;
       this.height = 500;
 
       this.svg = d3.select('.chart').append('svg:svg')
       .attr('width', this.width)
       .attr('height', this.height);
-
-      this.margin = {top: 20, right: 20, bottom: 30, left: 40};
 
       this.http.get("../assets/data/meteo.csv")
         .subscribe(
@@ -113,14 +115,13 @@ export class TemperatureComponent implements OnInit {
               .attr("class", "chart-axis")
               .attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")")
               .call(d3.axisBottom(this.xScale).tickSize(0).tickFormat((d, data) => {
-                console.log(this.months)
                 return this.months[+d - 1]
               }));
 
-            this.svg.append("g")
-             .attr("class", "chart-axis")
-             .attr('transform', 'translate(' + this.margin.left + ', 0)')
-             .call(d3.axisLeft(this.yScale).ticks(4));
+            // this.svg.append("g")
+            //  .attr("class", "chart-axis")
+            //  .attr('transform', 'translate(' + this.margin.left + ', 0)')
+            //  .call(d3.axisLeft(this.yScale).tickSize(0));
 
             this.svg.append("g")
              .attr("class", "chart-grid")
@@ -139,15 +140,14 @@ export class TemperatureComponent implements OnInit {
                 .attr("class", function() {
                   return 'chart-bar bar' + i
                 })
-                .attr("transform", "translate(0," + this.margin.top + ")")
+                // .attr("transform", "translate(0," + this.margin.top + ")")
                 .attr("x", this.xScale(+data['key']))
+                .attr("width", this.xScale.bandwidth())
+                .attr("y", this.yScale(data['value']['avg']))
+                .attr("height", this.height - this.margin.bottom - this.yScale(data['value']['avg']))
                 .attr("fill",
                   'rgba(192, 57, 43,'+ (0.10 * (data['value']['avg'] / this.groupWidth) + 0.10) + ')'
                 )
-                .attr("width", (this.width - this.margin.left - this.margin.right) / this.selectedData.values.length)
-                .attr("height", 0)
-                .attr("y", this.yScale(data['value']['avg']))
-                .attr("height", this.height - this.margin.top - this.margin.bottom - this.yScale(data['value']['avg']))
                 .on("mouseover", (data) => {
                   let values = this.selectedData['values'][i];
                   let columnWidth = ((this.width - this.margin.left - this.margin.right) / this.selectedData['values'].length) / 2
@@ -157,7 +157,7 @@ export class TemperatureComponent implements OnInit {
                     .attr("x", this.xScale(+values['key']) + columnWidth)
                     .attr("y", this.yScale(+values['value']['avg']))
                     .style("font-size", "12px")
-                    .style("fill", "rgba(0, 0, 0, 0.48)")
+                    .style("fill", "rgb(0, 0, 0)")
                     .text(values['value']['avg'].toFixed(1))
                     .attr("text-anchor", "middle");
 
@@ -168,6 +168,30 @@ export class TemperatureComponent implements OnInit {
                 });
             }
         });
+      }
+    }
+
+    onKeyArrowLeft(event) {
+      let yearIndex = this.data.map(function(year) {
+        return year.key;
+      }).indexOf(this.selectedYear);
+
+      if (yearIndex == 0) return;
+      else {
+        this.renderData(this.data[yearIndex - 1]);
+        this.d3.selectAll(".chart-tooltip").remove();
+      }
+    }
+
+    onKeyArrowRight(event) {
+      let yearIndex = this.data.map(function(year) {
+        return year.key;
+      }).indexOf(this.selectedYear);
+
+      if (yearIndex == (this.data.length -1)) return;
+      else {
+        this.renderData(this.data[yearIndex + 1]);
+        this.d3.selectAll(".chart-tooltip").remove();
       }
     }
 
@@ -190,11 +214,9 @@ export class TemperatureComponent implements OnInit {
 
         svg.select(bar)
           .duration(250)
-          .attr("fill",
-            'rgba(192, 57, 43,'+ (0.10 * (data['value']['avg'] / groupWidth) + 0.10) + ')'
-          )
+          .attr("fill", 'rgba(192, 57, 43,'+ (0.10 * (data['value']['avg'] / groupWidth) + 0.10) + ')')
           .attr("y", yScale(data['value']['avg']))
-          .attr("height", function() { return (height - margin.top - margin.bottom) - yScale(data['value']['avg']); });
+          .attr("height", height - margin.bottom - yScale(data['value']['avg']));
       }
     }
 
