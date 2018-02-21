@@ -3,6 +3,11 @@
   position: relative;
 }
 
+.disclaimer {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.36);
+}
+
 .graph-year {
   height: 64px;
 }

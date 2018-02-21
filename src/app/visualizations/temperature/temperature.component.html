@@ -11,8 +11,11 @@
       </div>
     </div>
     <span fxLayoutAlign="center center">
-      Average temperature per month in {{ selectedYear }}
+      Average temperature per month in {{ selectedYear }} in degrees Celsius.
     </span>
     <div class="chart"></div>
+    <span class="disclaimer" fxLayoutAlign="center center">
+      Note: This graph does not recalculate the y axis. This has been a deliberate decision to assist in a better comparison of temperatures between years. Specific code has been written, but is commented out.
+    </span>
   </div>
 </div>
