@@ -15,3 +15,4 @@ One of the datasets we will be given is [this one](https://staff.fnwi.uva.nl/g.s
 * On whole map: show heatmap of certain crime types, especially vehicle/bike related (should I park my bike/car there or better take pub transport?)
 
 * Given a specific route: Have a dot move along the route and as it moves crimes (with diff colors depending on types) pop up around it, for a certain radius. 
+* After assigning a specific "criminality" score for each neighborhood (according to the number of crimes and their respective severity), we can present some kind of ranking for each neighborhood , when it is selected: e.g. "Area 1: safety rank 13/89", where 89 are all areas of London.
