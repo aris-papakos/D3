@@ -7,27 +7,28 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { AppComponent } from './app.component';
-import { VisualizationsComponent } from './visualizations/visualizations.component';
-import { TemperatureComponent } from './visualizations/temperature/temperature.component';
 
 import { D3Service } from 'd3-ng2-service';
+import { LeafletComponent } from './leaflet/leaflet.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    VisualizationsComponent,
-    TemperatureComponent,
+    LeafletComponent,
   ],
   imports: [
-    BrowserModule,
+    AppMaterialModule,
+    AppRoutingModule,
     BrowserAnimationsModule,
+    BrowserModule,
+    HttpModule,
     FlexLayoutModule,
     FormsModule,
-    HttpModule,
-    AppRoutingModule,
-    AppMaterialModule
+    LeafletModule.forRoot()
   ],
   providers: [D3Service],
   bootstrap: [AppComponent]
