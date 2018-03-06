@@ -21,6 +21,7 @@ One of the datasets we will be given is [this one](https://staff.fnwi.uva.nl/g.s
 # Installation
 
 ## Prerequisites
+### ANgular CLI
 ### Node.JS
 Follow instructions on the [Node.js](https://nodejs.org/en/download/package-manager/) website.
 ### MongoDB (Will be moved online at a later stage)
