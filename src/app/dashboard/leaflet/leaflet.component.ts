@@ -32,8 +32,13 @@ export class LeafletComponent implements OnInit {
   ngOnInit() {
     this.getGeoJSON()
     .subscribe(data => {
+      geojson = {
+        "type": "FeatureCollection",
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+        "features": data
+      };
 
-      let wards = L.geoJSON(data ,{
+      let wards = L.geoJSON(geojson ,{
         style: {
           "color": "#ff7800",
           "weight": 5,
@@ -48,7 +53,7 @@ export class LeafletComponent implements OnInit {
   }
 
   public getGeoJSON(): Observable<any> {
-    return this.http.get("http://localhost:3000/api/lsoa/get")
+    return this.http.get("localhost:3000/api/lsoa/get")
     .map((res:any) => res.json())
     .catch((error:any) => {
       return Observable.throw(error);

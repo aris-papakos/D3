@@ -16,6 +16,8 @@ const router              = express.Router();
 // ============================ DEFAULT =============================
 // Catch all other routes and return the index file
 router.get('*', (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
   res.sendFile(path.join(__dirname, './dist/index.html'));
 });
 
