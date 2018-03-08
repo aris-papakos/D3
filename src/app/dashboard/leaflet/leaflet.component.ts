@@ -41,7 +41,7 @@ export class LeafletComponent implements OnInit {
   }
 
   public getGeoJSON(): Observable<any> {
-    return this.http.get("http://localhost:3000/api/lsoa/get")
+    return this.http.get("http://52.138.168.114:3000/api/lsoa/get")
     .map((res:any) => res.json())
     .catch((error:any) => {
       return Observable.throw(error);
