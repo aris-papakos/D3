@@ -1,0 +1,17 @@
+const ImportController       = require('./controllers/ImportController');
+
+const express = require('express');
+const router = express.Router();
+
+/* GET api listing. */
+
+// ============================= IMPORT =============================
+router.get('/import/lsoa', ImportController.lsoa);
+
+// ============================ DEFAULT =============================
+// Catch all other routes and return the index file
+router.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, './dist/index.html'));
+});
+
+module.exports = router;

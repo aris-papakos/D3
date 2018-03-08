@@ -10,15 +10,17 @@ import { RouterModule } from '@angular/router';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 import { AppComponent } from './app.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { LeafletComponent } from './dashboard/leaflet/leaflet.component';
 
 import { D3Service } from 'd3-ng2-service';
-import { LeafletComponent } from './leaflet/leaflet.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LeafletComponent,
+    DashboardComponent,
   ],
   imports: [
     AppMaterialModule,
