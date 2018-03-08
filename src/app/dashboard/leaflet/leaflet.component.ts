@@ -33,8 +33,13 @@ export class LeafletComponent implements OnInit {
     this.getGeoJSON()
     .subscribe(data => {
 
-      let wards = L.geoJSON(data);
-      console.log(wards)
+      let wards = L.geoJSON(data ,{
+        style: {
+          "color": "#ff7800",
+          "weight": 5,
+          "opacity": 0.65
+        };
+      });
       this.layers = [
         this.carto,
         wards
@@ -43,7 +48,7 @@ export class LeafletComponent implements OnInit {
   }
 
   public getGeoJSON(): Observable<any> {
-    return this.http.get("./assets/data/london.geojson")
+    return this.http.get("http://localhost:3000/api/lsoa/get")
     .map((res:any) => res.json())
     .catch((error:any) => {
       return Observable.throw(error);

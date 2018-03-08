@@ -1,12 +1,17 @@
-const ImportController       = require('./controllers/ImportController');
+const ImportController    = require('./controllers/ImportController');
+const LsoaController      = require('./controllers/LsoaController');
 
-const express = require('express');
-const router = express.Router();
+
+const express             = require('express');
+const router              = express.Router();
 
 /* GET api listing. */
 
 // ============================= IMPORT =============================
-router.get('/import/lsoa', ImportController.lsoa);
+// router.get('/import/lsoa', ImportController.lsoa);
+
+// ============================== LSOA ==============================
+  router.get('/lsoa/get', LsoaController.get);
 
 // ============================ DEFAULT =============================
 // Catch all other routes and return the index file

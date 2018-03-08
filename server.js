@@ -1,12 +1,18 @@
 // Get dependencies
-const express = require('express');
-const path = require('path');
-const http = require('http');
-const bodyParser = require('body-parser');
+const bodyParser          = require('body-parser');
+const express             = require('express');
+const http                = require('http');
+const mongoose            = require('mongoose');
+const path                = require('path');
+
 
 // Get our API routes
-const api = require('./server/api');
-const app = express();
+const app                 = express();
+const api                 = require('./server/api');
+const database            = require('./server/database.js');
+
+
+mongoose.connect(database.url);
 
 // Parsers for POST data
 app.use(bodyParser.json());
@@ -17,11 +23,6 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 // Set our api routes
 app.use('/api', api);
-
-// Catch all other routes and return the index file
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/index.html'));
-});
 
 /**
  * Get port from environment and store in Express.
