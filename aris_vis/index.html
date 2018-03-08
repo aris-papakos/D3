@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' href="main.css">
+    <meta charset="utf-8">
+    <script type="text/javascript" src="d3/d3.min.js"></script>
+    <title>Stream Graph</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+    var w = 800;
+    var h = 450;
+    var margin = {
+         top: 58,
+         bottom: 100,
+         left: 80,
+         right:40
+    };
+    var width = w - margin.right- margin.left;
+    var height = h- margin.top - margin.bottom;
+
+    var svg = d3.select('body').append("svg")
+                              .attr('id', 'chart')
+                              .attr('height',h)
+                              .attr('width', w);
+    var stream = svg.append("g")
+               .classed("display",true)
+               .attr('transform', 'translate('+margin.left+','+margin.top+')');
+
+    </script>
+
+  </body>
+</html>
