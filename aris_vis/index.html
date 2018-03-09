@@ -8,13 +8,35 @@
   </head>
   <body>
     <script type="text/javascript">
-    ;
 
-    d3.csv('toydata.csv', function(data) {
-             // data.forEach(function(d) {
-             //   d.date = format.parse(d.date);
-             //   d.value = +d.value;
-           console.log(data);
+
+  d3.csv('play_dataset.csv', function(data) {
+
+
+           var dataParser = d3.timeParse("%Y-%m");
+           console.log("2014-06");
+           console.log(dataParser("2014-06"));
+
+
+
+
+            data.forEach(function(d) {
+                             d.Month = dataParser(d.Month);
+                             d.count = +d.count;
+                           });
+
+
+
+            console.log(data);
+
+            // var dataParser = d3.timeParse("%m/%d/%y");
+            // console.log("01/06/14");
+            // console.log(dataParser("01/06/14"))
+
+
+
+
+
            var w = 800;
            var h = 450;
            var margin = {
@@ -25,13 +47,14 @@
            };
            var width = w - margin.right- margin.left;
            var height = h- margin.top - margin.bottom;
-           var dataParser = d3.timeParse("%Y-%m");
-           console.log("2014-06");
-           console.log(dataParser("2014-06"));
+
+           var z = d3.scaleOrdinal()
+                     .range(["#16223d", "#f7c143", "#118f63"]);
+
 
             var x = d3.scaleTime()
                      .domain(d3.extent(data, function (d) {
-                             var date = dataParser(d.Month);
+                             var date = d.Month;
                              return date;
                      }))
                      .range([0,width]);
@@ -62,13 +85,69 @@
                                        .attr('id', 'chart')
                                        .attr('height',h)
                                        .attr('width', w);
+
              var stream = svg.append("g")
                         .classed("display",true)
                         .attr('transform', 'translate('+margin.left+','+margin.top+')');
 
+          // var stack = d3.stack()
+          //       .keys(function(d) { return d.values; })
+          //       .offset(d3.stackOffsetSilhouette);
+
+          // var stack = d3.layout.stack()
+          //                   .offset("silhouette")
+          //                   .values(function(d) { return d.values; })
+          //                   .x(function(d) { return d.date; })
+          //                   .y(function(d) { return d.value; });
+          // var stack = d3.stack()
+          //               .value(function(d) { return d.values; })
+          //               .x(function(d) { return d.Month; })
+          //               .y(function(d) { return d.count; });
+
+          // .keys(['Anti-social behaviour', 'Bicycle theft', 'Burglary',
+          // 'Criminal damage and arson', 'Drugs', 'Other crime', 'Other theft',
+          // 'Possession of weapons', 'Public order', 'Robbery', 'Shoplifting',
+          // 'Theft from the person', 'Vehicle crime',
+          // 'Violence and sexual offences']);
+
+             //var stack = d3.stack();
+                 // .offset(d3.stackOffsetSilhouette)
+                 // .keys(function(d) { return d.values; });
+                 // .values(function(d) { return d.Month; });
+             // ['Anti-social behaviour', 'Bicycle theft', 'Burglary',
+             // 'Criminal damage and arson', 'Drugs', 'Other crime', 'Other theft',
+             // 'Possession of weapons', 'Public order', 'Robbery', 'Shoplifting',
+             // 'Theft from the person', 'Vehicle crime',
+             // 'Violence and sexual offences']
+             var nest = d3.nest()
+                         .key(function(d) {
+                            console.log(d);
+                            debugger;
+                            return d.Crime; })
+                         .entries(data);
+
+             var area = d3.area()
+                         .x(function(d) { return
+
+                            // var date = dataParser(d.Month);
+                            return x(d.Month)})
+                         .y0(function(d) {
+                           return y(d.y0); })
+                         .y1(function(d) { return y(d.y0 + d.y); })
+                         .curve(d3.curveCardinal);
+
+            console.log(nest);
+
+
+
+            var layers = nest;
+            //console.log(layers);
+
+
 
             function plot(params) {
                     // create x axis
+                    // console.log(params.layer);
                     this.append("g")
                         .classed("x axis", true)
                         .attr('transform', 'translate(0,'+height+')')
@@ -84,18 +163,37 @@
                         .classed("y axis2", true)
                         .attr('transform', 'translate('+width+',0)')
                         .call(params.axis.y2);
-                      }
+                    // enter
+                    this.selectAll(".layer")
+                        .data(params.layer)
+                        .enter()
+                          .append("path")
+                          .classed("layer",true);
+
+                    //update
+                    this.selectAll(".layer")
+                        .attr("d", function(d) {
+                          return area(d.values);
+                             })
+                        .style("fill", function(d, i) { return z(i); });
+                    //exit()
+                    this.selectAll(".layer")
+                        .data(params.layer)
+                        .exit()
+                        .remove();
+}
             plot.call(stream,{
                     data:data,
                     axis:{
                       x: xAxis,
                       y: yAxis,
                       y2: yAxis_right
-                    }
+                    },
+                    layer:layers
                });
 
-             });
 
+  });
 
 
 
