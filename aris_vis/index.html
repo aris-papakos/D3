@@ -6,198 +6,179 @@
     <script type="text/javascript" src="d3/d3.min.js"></script>
     <title>Stream Graph</title>
   </head>
-  <body>
-    <script type="text/javascript">
+
+<body>
+<script>
+var w = 800;
+ var h = 450;
+ var margin = {
+      top: 58,
+      bottom: 100,
+      left: 80,
+      right:40
+ };
+var width = w - margin.right- margin.left;
+var height = h- margin.top - margin.bottom;
+
+var crime_types =  ['Anti-social behaviour','Bicycle theft',"Burglary",
+                    "Criminal damage and arson","Drugs","Other crime","Other theft",
+                    "Possession of weapons","Public order","Robbery", "Shoplifting",
+                    "Theft from the person","Vehicle crime","Violence and sexual offences"];
+
+var z = d3.scaleLinear()
+          .range(["#51D0D7", "#31B5BB"]);
+
+var x = d3.scaleTime()
+          .range([0,width]);
+
+var y = d3.scaleLinear()
+          .range([height,0]);
+
+var xAxis = d3.axisBottom()
+              .scale(x)
+              .ticks(5);
+
+var yAxis = d3.axisLeft()
+              .scale(y)
+              .ticks(5);
+var yAxis_right = d3.axisRight()
+                    .scale(y)
+                    .ticks(5);
+var svg = d3.select('body').append("svg")
+                           .attr('id', 'chart')
+                           .attr('height',h)
+                           .attr('width', w);
+
+var stream = svg.append("g")
+                 .classed("display",true)
+                 .attr('transform', 'translate('+margin.left+','+margin.top+')');
 
 
-  d3.csv('play_dataset.csv', function(data) {
+var stack = d3.stack()
+              .keys(crime_types)
+              // .order(d3.stackOrderNone);
+              .order(d3.stackOrderAscending)
+              // .offset(d3.stackOffsetWiggle);
+              .offset(d3.stackOffsetWiggle);
 
 
-           var dataParser = d3.timeParse("%Y-%m");
-           console.log("2014-06");
-           console.log(dataParser("2014-06"));
+// LOAD CSV DATA
+d3.csv("aris_dataset.csv", function(crime_rows) {
+/////////////////////////////////////////////////////////////////////////////
+    // Data preprocessing
+    var expensesTotal = d3.nest()
+        .key(function(d) { return d.Month; })
+        .key(function(d) { return d.CrimeType; })
+        .rollup(function(v) { return v.length;
+                            })
+        .object(crime_rows);
+
+  console.log(expensesTotal);
+
+    // put label inside as key and return an array
+    var data = Object.keys(expensesTotal).map(function(key) {
+        expensesTotal[key].Month = key;
+
+        return expensesTotal[key];
+    });
+
+    console.log(data);
+    // TODO get crime types from labels??
 
 
-
-
-            data.forEach(function(d) {
-                             d.Month = dataParser(d.Month);
-                             d.count = +d.count;
-                           });
-
-
-
-            console.log(data);
-
-            // var dataParser = d3.timeParse("%m/%d/%y");
-            // console.log("01/06/14");
-            // console.log(dataParser("01/06/14"))
-
-
-
-
-
-           var w = 800;
-           var h = 450;
-           var margin = {
-                top: 58,
-                bottom: 100,
-                left: 80,
-                right:40
-           };
-           var width = w - margin.right- margin.left;
-           var height = h- margin.top - margin.bottom;
-
-           var z = d3.scaleOrdinal()
-                     .range(["#16223d", "#f7c143", "#118f63"]);
-
-
-            var x = d3.scaleTime()
-                     .domain(d3.extent(data, function (d) {
-                             var date = d.Month;
-                             return date;
-                     }))
-                     .range([0,width]);
-
-            var y = d3.scaleLinear()
-                      .domain([0,d3.max(data, function (d) {
-                            return d.count;
-                 })])
-                 .range([height,0]);
-
-
-
-            var xAxis = d3.axisBottom()
-                      .scale(x);
-                      // .ticks(d3.time.month,1)
-                      // .tickFormat(d3.timeFormat("%m/%Y"));
-                      // .tickFormat(d3.timeFormat("%m %d"))
-                      // .ticks(d3.time.years, 1)//should display 1 year intervals
-                      // .tickFormat(d3.time.format('%Y'))//%Y-for year boundaries, such as 2011
-                      // .tickSubdivide(12);//subdivide 12 months in a year
-            var yAxis = d3.axisLeft()
-                          .scale(y)
-                          .ticks(5);
-            var yAxis_right = d3.axisRight()
-                                .scale(y)
-                                .ticks(5);
-             var svg = d3.select('body').append("svg")
-                                       .attr('id', 'chart')
-                                       .attr('height',h)
-                                       .attr('width', w);
-
-             var stream = svg.append("g")
-                        .classed("display",true)
-                        .attr('transform', 'translate('+margin.left+','+margin.top+')');
-
-          // var stack = d3.stack()
-          //       .keys(function(d) { return d.values; })
-          //       .offset(d3.stackOffsetSilhouette);
-
-          // var stack = d3.layout.stack()
-          //                   .offset("silhouette")
-          //                   .values(function(d) { return d.values; })
-          //                   .x(function(d) { return d.date; })
-          //                   .y(function(d) { return d.value; });
-          // var stack = d3.stack()
-          //               .value(function(d) { return d.values; })
-          //               .x(function(d) { return d.Month; })
-          //               .y(function(d) { return d.count; });
-
-          // .keys(['Anti-social behaviour', 'Bicycle theft', 'Burglary',
-          // 'Criminal damage and arson', 'Drugs', 'Other crime', 'Other theft',
-          // 'Possession of weapons', 'Public order', 'Robbery', 'Shoplifting',
-          // 'Theft from the person', 'Vehicle crime',
-          // 'Violence and sexual offences']);
-
-             //var stack = d3.stack();
-                 // .offset(d3.stackOffsetSilhouette)
-                 // .keys(function(d) { return d.values; });
-                 // .values(function(d) { return d.Month; });
-             // ['Anti-social behaviour', 'Bicycle theft', 'Burglary',
-             // 'Criminal damage and arson', 'Drugs', 'Other crime', 'Other theft',
-             // 'Possession of weapons', 'Public order', 'Robbery', 'Shoplifting',
-             // 'Theft from the person', 'Vehicle crime',
-             // 'Violence and sexual offences']
-             var nest = d3.nest()
-                         .key(function(d) {
-                            console.log(d);
-                            debugger;
-                            return d.Crime; })
-                         .entries(data);
-
-             var area = d3.area()
-                         .x(function(d) { return
-
-                            // var date = dataParser(d.Month);
-                            return x(d.Month)})
-                         .y0(function(d) {
-                           return y(d.y0); })
-                         .y1(function(d) { return y(d.y0 + d.y); })
-                         .curve(d3.curveCardinal);
-
-            console.log(nest);
+    // TODO add data.columns
+    data.columns = crime_types;
 
 
 
-            var layers = nest;
-            //console.log(layers);
+    console.log(data);
 
 
 
-            function plot(params) {
-                    // create x axis
-                    // console.log(params.layer);
-                    this.append("g")
-                        .classed("x axis", true)
-                        .attr('transform', 'translate(0,'+height+')')
-                        .call(params.axis.x);
-                    // create y axis left
-                    this.append("g")
-                        .classed("y axis", true)
-                        .attr('transform', 'translate(0,0)')
-                        .call(params.axis.y);
+//////////////////////////////////////////////////////////////////////////
 
-                    // create y axis right
-                    this.append("g")
-                        .classed("y axis2", true)
-                        .attr('transform', 'translate('+width+',0)')
-                        .call(params.axis.y2);
-                    // enter
-                    this.selectAll(".layer")
-                        .data(params.layer)
-                        .enter()
-                          .append("path")
-                          .classed("layer",true);
+    //Date parse
+    var dataParser = d3.timeParse("%Y-%m");
+    data.forEach(function(d) {
+                          d.Month = dataParser(d.Month);
+                          // d.count = +d.count;
+                        });
+    console.log(data);
+//////////////////////////////////////////////////////////////////////////
+    var maxDateVal = d3.sum(data, function(d){
+                                var vals = d3.keys(d).map(function(key){ return key !== 'Month' ? d[key] : 0 });
+                                return d3.max(vals);
+                              });
+    console.log(maxDateVal);
 
-                    //update
-                    this.selectAll(".layer")
-                        .attr("d", function(d) {
-                          return area(d.values);
-                             })
-                        .style("fill", function(d, i) { return z(i); });
-                    //exit()
-                    this.selectAll(".layer")
-                        .data(params.layer)
-                        .exit()
-                        .remove();
-}
-            plot.call(stream,{
-                    data:data,
-                    axis:{
-                      x: xAxis,
-                      y: yAxis,
-                      y2: yAxis_right
-                    },
-                    layer:layers
-               });
+    var series = stack(data);
+    console.log(series);
+
+    x.domain(d3.extent(data, function (d) {
+                             return d.Month;
+                     }));
+
+    y.domain([0,2000]);// todo----see it
+
+    var xAxis = d3.axisBottom()
+                  .scale(x);
 
 
-  });
+    var area = d3.area()
+        .x(function(d) {
+          return x(d.data.Month);
+         })
+        .y0(function(d) { return y(d[0]); })
+        .y1(function(d) { return y(d[1]); })
+        .curve(d3.curveCardinal);
+        // .curve(d3.curveBasis);
 
+    function plot(params) {
+              // create x axis
 
+              this.append("g")
+                  .classed("x axis", true)
+                  .attr('transform', 'translate(0,'+height+')')
+                  .call(params.axis.x);
+
+              // create y axis left
+              this.append("g")
+                  .classed("y axis", true)
+                  .attr('transform', 'translate(0,0)')
+                  .call(params.axis.y);
+
+              // create y axis right
+              this.append("g")
+                  .classed("y axis2", true)
+                  .attr('transform', 'translate('+width+',0)')
+                  .call(params.axis.y2);
+
+              // enter
+              this.selectAll(".layer")
+                  .data(params.layer)
+                  .enter()
+                    .append("path")
+                    .classed("layer",true);
+
+             //update
+             this.selectAll(".layer")
+                 .attr("d", area)
+                 .style("fill",function(d, i) { return z(i); });
+
+               }
+
+      plot.call(stream,{
+                  data:data,
+                  axis:{
+                    x: xAxis,
+                    y: yAxis,
+                   y2: yAxis_right
+                 },
+                 layer:series
+
+                   });
+});
 
     </script>
-
   </body>
 </html>
