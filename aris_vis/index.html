@@ -29,10 +29,10 @@ var z = d3.scaleLinear()
           .range(["#51D0D7", "#31B5BB"]);
 
 var x = d3.scaleTime()
-          .range([0,width]);
+          .range([0,width-5]);
 
 var y = d3.scaleLinear()
-          .range([height,0]);
+          .range([height-20,0]);
 
 var xAxis = d3.axisBottom()
               .scale(x)
@@ -144,13 +144,13 @@ d3.csv("aris_dataset.csv", function(crime_rows) {
               // create y axis left
               this.append("g")
                   .classed("y axis", true)
-                  .attr('transform', 'translate(0,0)')
+                  .attr('transform', 'translate('+-5+','+20+')')
                   .call(params.axis.y);
 
               // create y axis right
               this.append("g")
                   .classed("y axis2", true)
-                  .attr('transform', 'translate('+width+',0)')
+                  .attr('transform', 'translate('+width+','+20+')')
                   .call(params.axis.y2);
 
               // enter
@@ -160,13 +160,32 @@ d3.csv("aris_dataset.csv", function(crime_rows) {
                     .append("path")
                     .classed("layer",true);
 
+
+
              //update
              this.selectAll(".layer")
                  .attr("d", area)
-                 .style("fill",function(d, i) { return z(i); });
+                 .style("fill",function(d, i) { return z(i); })
+                 .style("stroke", "black")
+                 .style("opacity",0.5)
+                 .on("mouseover", function(d,i){
+                       d3.select(this)
+                         .style("opacity",1)
+                 })
+                 .on("mouseout",function(d,i){
+                   d3.select(this)
+                       //.classed("highlight", true)
+                      .transition()
+                       .style("opacity", 0.5);
 
-               }
+                 });
+             //exit()
+             this.selectAll(".layer")
+                .data(params.layer)
+                .exit()
+                .remove();
 
+      }
       plot.call(stream,{
                   data:data,
                   axis:{
