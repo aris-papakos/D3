@@ -63,7 +63,9 @@ var stack = d3.stack()
 
 
 // LOAD CSV DATA
-d3.csv("aris_dataset.csv", function(crime_rows) {
+// d3.csv("aris_dataset.csv", function(crime_rows) {
+// LOAD JSON data
+d3.json("playground.json", function(crime_rows) {
 /////////////////////////////////////////////////////////////////////////////
     // Data preprocessing
     var expensesTotal = d3.nest()
