@@ -3,10 +3,24 @@
 <svg width="960" height="960" font-family="sans-serif" font-size="10"></svg>
 <script src="js/d3.min.js"></script>
 <script src="js/d3-scale-radial.js"></script>
-<style>
+<style type="text/css">
     .axis {
         stroke: gray
     }
+
+.toolTip {
+  position: absolute;
+  display: none;
+  min-width: 80px;
+  height: auto;
+  background: none repeat scroll 0 0 #ffffff;
+  border: 1px solid #6F257F;
+  padding: 14px;
+  text-align: center;
+}
+.toolTip.hidden {
+  display: none;
+}
 </style>
 <script>
 
@@ -21,6 +35,8 @@
         chartHeight= height - margin.top - margin.bottom,
         outerRadius = (Math.min(chartWidth, chartHeight) / 2),
         g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	
+	var tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
     var angle = d3.scaleLinear()
         .range([0, 2 * Math.PI]);
@@ -39,12 +55,11 @@
         .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
 
 
-
 // Load data and go
-d3.csv("data/streets_sample2.csv", function(crime_rows) {
+d3.csv("data/streets_sample.csv", function(crime_rows) {
     // Data preprocessing
     var expensesTotal = d3.nest()
-        .key(function(d) { return d.Month; })
+        .key(function(d) { return d.Month.split("-")[1]; })
         .key(function(d) { return d.CrimeType; })
         .rollup(function(v) { return v.length;
                             })
@@ -62,7 +77,6 @@ d3.csv("data/streets_sample2.csv", function(crime_rows) {
     // put label inside as key and return an array
     var data = Object.keys(expensesTotal).map(function(key) {
         expensesTotal[key].label = key;
-
         return expensesTotal[key];
     });
 
@@ -71,13 +85,23 @@ d3.csv("data/streets_sample2.csv", function(crime_rows) {
     var crime_types = ["Vehicle crime", "Violence and sexual offences", "Anti-social behaviour", "Theft from the person", "Other theft", "Drugs", "Public order", 
         "Burglary", "Shoplifting", "Criminal damage and arson", "Other crime", "Bicycle theft", "Robbery", "Possession of weapons"];
 
-    // TODO add data.columns
+    // add data.columns (crime variables)
     data.columns = crime_types;
 
+    // sort by months
+    data.sort(function(a, b) {
+			    var textA = a.label;
+			    var textB = b.label;
+			    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+			});
 
 
-    console.log(data);
     // time to plugin 2nd function as plain code
+    months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    // TODO divide crimes per year to create average???
+
+
 
     x.domain(data.map(function(d) { return d.label; }));
     y.domain([0, d3.max(data, function(d) { return d.total; })]);
@@ -92,9 +116,11 @@ d3.csv("data/streets_sample2.csv", function(crime_rows) {
             .data(d3.stack().keys(data.columns.slice(1))(data))
             .enter().append("g")
             .attr("fill", function(d) { return z(d.key); })
+            .attr("identifier", function(d) { return d.key; })
             .selectAll("path")
             .data(function(d) { return d; })
             .enter().append("path")
+            .attr("class","rosendaleArc")
             .attr("d", d3.arc()
                 .innerRadius(function(d) { return y(d[0]); })
                 .outerRadius(function(d) { return y(d[1]); })
@@ -102,7 +128,36 @@ d3.csv("data/streets_sample2.csv", function(crime_rows) {
                 .endAngle(function(d) { return x(d.data.label) + x.bandwidth(); })
                 .padAngle(0.01)
                 .padRadius(innerRadius))
-            .attr("transform", function() {return "rotate("+ angleOffset + ")"});
+            .attr("transform", function(d) {return "rotate("+ angleOffset + ")"})
+            .on('mouseover', function (d){
+            	// alert("And what if I wanna buy a house in London?");
+            	d3.selectAll(".rosendaleArc")
+					.transition().duration(200)
+					.style("fill-opacity", 0.5);
+				d3.select(this)
+					.transition().duration(200)
+					.style("fill-opacity", 1);
+
+
+				//TODO divide per year for avg?
+				var crimeType = d3.select(this.parentNode).datum().key;
+	            tooltip
+	              .style("left", d3.event.pageX - 50 + "px")
+	              .style("top", d3.event.pageY - 85 + "px")
+	              .style("display", "inline-block")
+	              .html( crimeType + "<br>" + (d[1]-d[0]))
+	              //(months[d.data.label-1]) +
+	              ;
+
+            })
+		.on("mouseout", function(){
+        	d3.selectAll(".rosendaleArc")
+				.transition().duration(200)
+				.style("fill-opacity", 1);
+			// d3.selectAll(".toolTip")
+			tooltip.style("display", "none");
+			})
+            ;
         // debugger;
         var label = g.append("g")
             .selectAll("g")
@@ -113,8 +168,62 @@ d3.csv("data/streets_sample2.csv", function(crime_rows) {
 
         label.append("text")
             .attr("transform", function(d) { return (x(d.label) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)"; })
-            .text(function(d) { return d.label; })
+            .text(function(d) { return months[d.label-1]; })
             .style("font-size",14);
+
+
+        // add axis
+        // g.selectAll(".axis")
+        //     .data(d3.range(angle.domain()[1]))
+        //     .enter().append("g")
+        //     .attr("class", "axis")
+        //     .attr("transform", function(d) { return "rotate(" + angle(d) * 180 / Math.PI + ")"; })
+        //     .call(d3.axisLeft()
+        //         .scale(radius.copy().range([-innerRadius, -(outerRadius+10)])));
+
+        // for circular y axis
+        // var yAxis = g.append("g")
+        //     .attr("text-anchor", "middle");
+
+        // var yTick = yAxis
+        //     .selectAll("g")
+        //     .data(y.ticks(5).slice(1))
+        //     .enter().append("g");
+
+        // yTick.append("circle")
+        //     .attr("fill", "none")
+        //     .attr("stroke", "gray")
+        //     .attr("stroke-dasharray", "4,4")
+        //     .attr("r", y);
+
+        // yTick.append("text")
+        //     .attr("y", function(d) { return -y(d); })
+        //     .attr("dy", "-0.35em")
+        //     .attr("x", function() { return -10; })
+        //     .text(y.tickFormat(5, "s"))
+        //     .style("font-size",14);
+
+
+        // Legend
+
+        var legend = g.append("g")
+            .selectAll("g")
+            .data(data.columns.slice(1).reverse())
+            .enter().append("g")
+           // .attr("transform", function(d, i) { return "translate(-40," + (i - (data.columns.length - 1) / 2) * 20 + ")"; });
+            .attr("transform", function(d, i) { return "translate(" + (outerRadius-100) + "," + (-outerRadius + 100 +(i - (data.columns.length - 1) / 2) * 20) + ")"; });
+
+        legend.append("rect")
+            .attr("width", 18)
+            .attr("height", 18)
+            .attr("fill", z);
+
+        legend.append("text")
+            .attr("x", 24)
+            .attr("y", 9)
+            .attr("dy", "0.35em")
+            .text(function(d) { return d; })
+            .style("font-size",12);
 
     }
 
