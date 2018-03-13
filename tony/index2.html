@@ -56,7 +56,7 @@
 
 
 // Load data and go
-d3.csv("data/streets_sample.csv", function(crime_rows) {
+d3.json("data/playground.json", function(crime_rows) {
     // Data preprocessing
     var expensesTotal = d3.nest()
         .key(function(d) { return d.Month.split("-")[1]; })
@@ -73,6 +73,30 @@ d3.csv("data/streets_sample.csv", function(crime_rows) {
         expensesTotal[i].total = t; //append new key 'total' to estimate 
         }
 
+    var numYears = d3.nest()
+    	.key(function(d) {
+    		return d.Month.split("-")[0];
+    	})
+    	.rollup(function (v){
+    		return v.length;
+    	})
+    	.entries(crime_rows)
+    	.length
+    	;
+
+    console.log(numYears);
+
+
+	var nested_data = d3.nest()
+		.key(function(d) { return d.CrimeType; })
+		.entries(crime_rows);
+
+
+    var crime_types = []
+      nested_data.forEach(function(key) {
+        crime_types.push(key.key)
+      });
+
 
     // put label inside as key and return an array
     var data = Object.keys(expensesTotal).map(function(key) {
@@ -80,10 +104,10 @@ d3.csv("data/streets_sample.csv", function(crime_rows) {
         return expensesTotal[key];
     });
 
+    // TODO sort crime types by labels (to avoid changing colors in every iteration)??
+    // var crime_types = ["Vehicle crime", "Violence and sexual offences", "Anti-social behaviour", "Theft from the person", "Other theft", "Drugs", "Public order", 
+    //     "Burglary", "Shoplifting", "Criminal damage and arson", "Other crime", "Bicycle theft", "Robbery", "Possession of weapons"];
 
-    // TODO get crime types from labels??
-    var crime_types = ["Vehicle crime", "Violence and sexual offences", "Anti-social behaviour", "Theft from the person", "Other theft", "Drugs", "Public order", 
-        "Burglary", "Shoplifting", "Criminal damage and arson", "Other crime", "Bicycle theft", "Robbery", "Possession of weapons"];
 
     // add data.columns (crime variables)
     data.columns = crime_types;
@@ -98,10 +122,6 @@ d3.csv("data/streets_sample.csv", function(crime_rows) {
 
     // time to plugin 2nd function as plain code
     months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-    // TODO divide crimes per year to create average???
-
-
 
     x.domain(data.map(function(d) { return d.label; }));
     y.domain([0, d3.max(data, function(d) { return d.total; })]);
@@ -145,7 +165,7 @@ d3.csv("data/streets_sample.csv", function(crime_rows) {
 	              .style("left", d3.event.pageX - 50 + "px")
 	              .style("top", d3.event.pageY - 85 + "px")
 	              .style("display", "inline-block")
-	              .html( crimeType + "<br>" + (d[1]-d[0]))
+	              .html( crimeType + "<br>" + parseInt((d[1]-d[0])/numYears) +" on average")
 	              //(months[d.data.label-1]) +
 	              ;
 
