@@ -1,0 +1,17 @@
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.pane.padding {
+  padding: 20px;
+}
+
+.text-line {
+  padding: 5px;
+  margin: 14.5px 1px 0px 1px;
+}
+
+.text-form {
+  width: 220px;
+}

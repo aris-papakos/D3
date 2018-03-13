@@ -1,5 +1,6 @@
 // app/controllers/ImportController.js
 const Lsoa                = require('../models/lsoa');
+const Ward                = require('../models/ward');
 
 const async               = require('async');
 const parse               = require('csv-parse');
@@ -48,32 +49,6 @@ module.exports = (function() {
             callback(null);
           });
         },
-        // function(callback) {
-        //   console.log('lsoa postcode');
-        //   let parser = parse({delimiter: ','}, function (err, data) {
-        //     async.eachOf(data, function (line, index, callback) {
-        //       if (index == 0) callback();
-        //
-        //       else {
-        //         if (londonLsoa.indexOf(line[3]) === -1) {
-        //           callback();
-        //         } else {
-        //           LondonPostcodes.push({
-        //             'lsoa': line[3], 'pcd7': line[0], 'pcd8': line[1]
-        //           });
-        //           callback();
-        //         }
-        //       }
-        //     }, function(err) {
-        //       if (err) console.error(err);
-        //
-        //       console.log(LondonPostcodes.length);
-        //       callback(null);
-        //     });
-        //   });
-        //
-        //   fs.createReadStream('./server/assets/postcodes.csv').pipe(parser);
-        // },
         function(callback) {
           console.log('filter lsoa');
           async.each(londonGeo.features, function (feature, callback) {
@@ -106,10 +81,48 @@ module.exports = (function() {
 
         return res.send(LondonPostcodes);
       });
-
-
     },
+    wards: function(req, res, next) {
+      let wardsGeo        = {};
 
+      async.waterfall([
+        function(callback) {
+          fs.readFile('./server/assets/wards.geojson', 'utf8', function (err, data) {
+            if (err) console.error(err);
+
+            wardsGeo = JSON.parse(data);
+            callback(null);
+          });
+        },
+        function(callback) {
+          async.each(wardsGeo.features, function (feature, callback) {
+
+            let ward = new Ward({
+              'type'          : 'Feature',
+              'properties'    : {
+                'name'          : feature.properties["NAME"],
+                'borough'       : feature.properties["BOROUGH"],
+                'hectares'      : feature.properties["HECTARES"]
+              },
+              'geometry'      : feature.geometry
+            })
+            ward.save(function(err) {
+              if (err) console.error(err);
+
+              callback();
+            });
+
+          }, function(err) {
+            callback(null);
+          });
+        }
+      ], function(err, result) {
+        if (err) console.error(err);
+        console.log('all done');
+
+        return res.send('imported ' + wardsGeo.features.length + ' wards');
+      });
+    },
   }
 
 })();

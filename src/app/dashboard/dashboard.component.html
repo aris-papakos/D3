@@ -1,1 +1,25 @@
-<app-leaflet></app-leaflet>
+<div class="container" fxLayout="row">
+  <div class="pane padding" fxFlex fxLayout="row wrap">
+    <span class="text-line">I live in the </span>
+
+    <form>
+      <mat-form-field class="text-form">
+        <input type="text" aria-label="Ward" matInput
+          [formControl]="wardControl"
+          [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </form>
+
+    <span class="text-line">ward</span>
+
+  </div>
+
+  <div class="pane" fxFlex>
+    <app-leaflet></app-leaflet>
+  </div>
+</div>

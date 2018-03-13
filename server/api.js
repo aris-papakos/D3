@@ -1,5 +1,6 @@
+const CrimeController     = require('./controllers/CrimeController');
 const ImportController    = require('./controllers/ImportController');
-const LsoaController      = require('./controllers/LsoaController');
+const WardsController     = require('./controllers/WardsController');
 
 
 const express             = require('express');
@@ -9,16 +10,12 @@ const router              = express.Router();
 
 // ============================= IMPORT =============================
 // router.get('/import/lsoa', ImportController.lsoa);
+// router.get('/import/wards', ImportController.wards);
 
-// ============================== LSOA ==============================
-  router.get('/lsoa/get', LsoaController.get);
+// ============================= CRIME ==============================
+router.get('/crime/get', CrimeController.get);
 
-// ============================ DEFAULT =============================
-// Catch all other routes and return the index file
-router.get('*', (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  res.sendFile(path.join(__dirname, './dist/index.html'));
-});
+// ============================== WARD ==============================
+router.get('/ward/get', WardsController.get);
 
 module.exports = router;

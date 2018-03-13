@@ -1,9 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import {Observable} from 'rxjs/Rx';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import * as L from 'leaflet';
+import { Component, OnInit }        from '@angular/core';
+import { DataService }              from '../../services/data.service'
+import * as L                       from 'leaflet';
 
 
 @Component({
@@ -11,40 +8,39 @@ import * as L from 'leaflet';
   templateUrl: './leaflet.component.html',
   styleUrls: ['./leaflet.component.css']
 })
+
 export class LeafletComponent implements OnInit {
   // LAYERS
   carto = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
     maxZoom: 18,
     attribution: '&copy;<a href="https://carto.com/attribution">CARTO</a>',
-  });
-  wards = {};
+  })
   // LEAFLET OPTIONS
   options = {
-  	zoom: 12,
+  	zoom: 10,
   	center: L.latLng(51.509865, -0.118092)
   };
-  layers: any;
+  layers = [
+    this.carto
+  ]
 
-  constructor(private http: Http) {
+  // WARDS
+  wards = {};
 
-  }
+  constructor(private dataService: DataService) { }
 
   ngOnInit() {
-    this.getGeoJSON()
+    this.dataService.getWards()
     .subscribe(data => {
-      let wards = L.geoJSON(data);
-      this.layers = [
-        this.carto,
-        wards
-      ];
-    });
-  }
+      this.wards = L.geoJSON(data);
+      let length = data.length;
+      let names = [];
+      for (let i = 0; i < length; i++) {
+        names.push(data[i].properties.name);
+      }
 
-  public getGeoJSON(): Observable<any> {
-    return this.http.get("http://52.138.168.114:3000/api/lsoa/get")
-    .map((res:any) => res.json())
-    .catch((error:any) => {
-      return Observable.throw(error);
+      this.dataService.setWardNames(names);
+      // this.layers.push(wards);
     });
   }
 
