@@ -20,10 +20,6 @@ var w = 800;
 var width = w - margin.right- margin.left;
 var height = h- margin.top - margin.bottom;
 
-var crime_types =  ['Anti-social behaviour','Bicycle theft',"Burglary",
-                    "Criminal damage and arson","Drugs","Other crime","Other theft",
-                    "Possession of weapons","Public order","Robbery", "Shoplifting",
-                    "Theft from the person","Vehicle crime","Violence and sexual offences"];
 
 var z = d3.scaleLinear()
           .range(["#51D0D7", "#31B5BB"]);
@@ -54,19 +50,32 @@ var stream = svg.append("g")
                  .attr('transform', 'translate('+margin.left+','+margin.top+')');
 
 
-var stack = d3.stack()
-              .keys(crime_types)
-              // .order(d3.stackOrderNone);
-              .order(d3.stackOrderAscending)
-              // .offset(d3.stackOffsetWiggle);
-              .offset(d3.stackOffsetWiggle);
+
 
 
 // LOAD CSV DATA
 // d3.csv("aris_dataset.csv", function(crime_rows) {
+
 // LOAD JSON data
 d3.json("playground.json", function(crime_rows) {
 /////////////////////////////////////////////////////////////////////////////
+
+      console.log(crime_rows);
+
+      var nested_data = d3.nest()
+        .key(function(d) { return d.CrimeType; })
+        .entries(crime_rows);
+
+      console.log(nested_data);
+
+      //crime categories
+      var crime_types = []
+
+      nested_data.forEach(function(key) {
+        crime_types.push(key.key)
+      });
+      console.log(crime_types);
+
     // Data preprocessing
     var expensesTotal = d3.nest()
         .key(function(d) { return d.Month; })
@@ -91,11 +100,7 @@ d3.json("playground.json", function(crime_rows) {
     // TODO add data.columns
     data.columns = crime_types;
 
-
-
     console.log(data);
-
-
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -106,12 +111,20 @@ d3.json("playground.json", function(crime_rows) {
                           // d.count = +d.count;
                         });
     console.log(data);
+
 //////////////////////////////////////////////////////////////////////////
+
     var maxDateVal = d3.sum(data, function(d){
                                 var vals = d3.keys(d).map(function(key){ return key !== 'Month' ? d[key] : 0 });
                                 return d3.max(vals);
                               });
     console.log(maxDateVal);
+    var stack = d3.stack()
+                  .keys(crime_types)
+                  // .order(d3.stackOrderNone);
+                  .order(d3.stackOrderAscending)
+                  // .offset(d3.stackOffsetWiggle);
+                  .offset(d3.stackOffsetWiggle);
 
     var series = stack(data);
     console.log(series);
@@ -134,6 +147,8 @@ d3.json("playground.json", function(crime_rows) {
         .y1(function(d) { return y(d[1]); })
         .curve(d3.curveCardinal);
         // .curve(d3.curveBasis);
+
+
 
     function plot(params) {
               // create x axis
