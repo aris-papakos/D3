@@ -121,10 +121,11 @@ d3.json("playground.json", function(crime_rows) {
     console.log(maxDateVal);
     var stack = d3.stack()
                   .keys(crime_types)
-                  // .order(d3.stackOrderNone);
                   .order(d3.stackOrderAscending)
-                  // .offset(d3.stackOffsetWiggle);
                   .offset(d3.stackOffsetWiggle);
+                  // .order(d3.stackOrderNone);
+                  // .offset(d3.stackOffsetWiggle);
+
 
     var series = stack(data);
     console.log(series);
@@ -133,7 +134,7 @@ d3.json("playground.json", function(crime_rows) {
                              return d.Month;
                      }));
 
-    y.domain([0,2000]);// todo----see it
+    y.domain([0,2000]);// todo----see it---make it DYNAMIC
 
     var xAxis = d3.axisBottom()
                   .scale(x);
@@ -151,8 +152,8 @@ d3.json("playground.json", function(crime_rows) {
 
 
     function plot(params) {
-              // create x axis
 
+              // create x axis
               this.append("g")
                   .classed("x axis", true)
                   .attr('transform', 'translate(0,'+height+')')
@@ -177,8 +178,6 @@ d3.json("playground.json", function(crime_rows) {
                     .append("path")
                     .classed("layer",true);
 
-
-
              //update
              this.selectAll(".layer")
                  .attr("d", area)
@@ -191,18 +190,19 @@ d3.json("playground.json", function(crime_rows) {
                  })
                  .on("mouseout",function(d,i){
                    d3.select(this)
-                       //.classed("highlight", true)
-                      .transition()
-                       .style("opacity", 0.5);
+                     .transition()
+                     .style("opacity", 0.5);
 
                  });
              //exit()
              this.selectAll(".layer")
-                .data(params.layer)
-                .exit()
-                .remove();
+                 .data(params.layer)
+                 .exit()
+                 .remove();
 
       }
+
+      //CALL function
       plot.call(stream,{
                   data:data,
                   axis:{
