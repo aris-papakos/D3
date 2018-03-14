@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title>Radar Chart - Crime Data London</title>
+
+		<!-- Google fonts -->
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+		<!-- D3.js -->
+		<script type="text/javascript" src="d3/d3.js"></script>
+
+		<style>
+			body {
+				font-family: 'Open Sans', sans-serif;
+				font-size: 11px;
+				font-weight: 300;
+				fill: #242424;
+				text-align: center;
+				text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+				cursor: default;
+			}
+
+			.legend {
+				font-family: 'Raleway', sans-serif;
+				fill: #333333;
+			}
+
+			.tooltip {
+				fill: #333333;
+			}
+		</style>
+
+	</head>
+	<body>
+
+		<div class="RadarChart"></div>
+
+		<script src="RadarChart.js"></script>
+		<script>
+
+
+		//Read Data
+		d3.json("playground.json", function(crime_rows){
+
+			rawData = crime_rows.map(function(d){
+			return {
+				crime : d.CrimeType}
+			});
+
+			//Calculate total number of crimes (needed for calculating fraction)
+			var total = rawData.length
+
+			//data preprocessing
+			var data = d3.nest()
+			.key(function(d) { return d.CrimeType; })
+			.rollup(function(v) {
+			 return +d3.format(".2f")(v.length / total);})
+			.entries(crime_rows);
+
+			//Average crime data of London (Dummy Data)
+			var londonAVG = [//London Average
+			{key: 'Anti-social behaviour', value:0.15},
+			{key: 'Violence and sexual offences', value:0.15},
+			{key: 'Other theft', value:0.09},
+			{key: 'Vehicle crime', value:0.35},
+			{key: 'Burglary', value:0.2},
+			{key: 'Criminal damage and arson', value:0.2},
+			{key: 'Public order', value:0.12},
+			{key: 'Shoplifting', value:0.2},
+			{key: 'Theft from the person', value:0.2},
+			{key: 'Drugs', value:0.2},
+			{key: 'Robbery', value:0.44},
+			{key: 'Bicycle theft', value:0.2},
+			{key: 'Other crime', value:0.2},
+			{key: 'Possession of weapons', value:0.2}
+		];
+
+		//Only choose categories of London Average that are in the query data
+		var londonArray = []
+		for(i=0; i < londonAVG.length; i++) {
+			for(j=0; j < data.length; j++) {
+				if (londonAVG[i].key === data[j].key) {
+					londonArray.push(londonAVG[i]);
+				}
+			}};
+
+
+		//Add crime data of area of interest and London to dataArray
+		var dataArray = [];
+		dataArray.push(data);
+		dataArray.push(londonArray);
+
+
+			//Sort crimes based on top crimes of area of interest
+			function compare(a,b) {
+				if (b.value - a.value > 0)
+					return 1;
+			  if (b.value - a.value < 0)
+			    return -1;
+			  return 0;}
+
+			dataArray[0].sort(compare);
+
+			//Show only top 6 crime categories (or less)
+			dataArray[0].splice(6)
+			dataArray[1].splice(6)
+
+
+			//Call function to draw the Radar chart
+			RadarChart(".RadarChart", dataArray);
+
+
+
+
+//Create missing Legend
+
+var colorscale = d3.scaleOrdinal(d3.schemeCategory10);
+
+//Legend titles
+var LegendOptions = ['Area of Interest', 'London Average'];
+
+var svg = d3.select('body')
+	.selectAll('svg')
+	.append('svg')
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height)
+
+//Initiate Legend
+var legend = svg.append("g")
+	.attr("class", "legend")
+	.attr('transform', 'translate(90,20)')
+	;
+	//Create colour squares
+	legend.selectAll('rect')
+	  .data(LegendOptions)
+	  .enter()
+	  .append("rect")
+	  .attr("x", width)
+	  .attr("y", function(d, i){ return i * 20;})
+	  .attr("width", 10)
+	  .attr("height", 10)
+	  .style("fill", function(d, i){ return colorscale(i);})
+	  ;
+		//Create text next to squares
+ legend.selectAll('text')
+	.data(LegendOptions)
+	.enter()
+	.append("text")
+	.attr("x", width+15)
+	.attr("y", function(d, i){ return i * 20 + 9;})
+	.attr("font-size", "11px")
+	.attr("fill", "#737373")
+	.text(function(d) { return d; })
+	;
+	});
+
+		</script>
+	</body>
+</html>
