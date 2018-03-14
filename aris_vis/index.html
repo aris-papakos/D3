@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel='stylesheet' href="main.css">
+    <link rel='stylesheet' href="main3.css">
     <meta charset="utf-8">
     <script type="text/javascript" src="d3/d3.min.js"></script>
     <title>Stream Graph</title>
@@ -9,20 +9,22 @@
 
 <body>
 <script>
-var w = 800;
+var w = 1000;
  var h = 450;
  var margin = {
       top: 58,
-      bottom: 100,
-      left: 80,
-      right:40
+      bottom: 80,
+      left: 100,
+      right:80
  };
 var width = w - margin.right- margin.left;
 var height = h- margin.top - margin.bottom;
 
 
 var z = d3.scaleLinear()
+          // .range(["#51D0D7", "#31B5BB"]);
           .range(["#51D0D7", "#31B5BB"]);
+
 
 var x = d3.scaleTime()
           .range([0,width-5]);
@@ -32,7 +34,7 @@ var y = d3.scaleLinear()
 
 var xAxis = d3.axisBottom()
               .scale(x)
-              .ticks(5);
+              .ticks(10);
 
 var yAxis = d3.axisLeft()
               .scale(y)
@@ -60,13 +62,13 @@ var stream = svg.append("g")
 d3.json("playground.json", function(crime_rows) {
 /////////////////////////////////////////////////////////////////////////////
 
-      console.log(crime_rows);
+      // console.log(crime_rows);
 
       var nested_data = d3.nest()
         .key(function(d) { return d.CrimeType; })
         .entries(crime_rows);
 
-      console.log(nested_data);
+      // console.log(nested_data);
 
       //crime categories
       var crime_types = []
@@ -74,7 +76,7 @@ d3.json("playground.json", function(crime_rows) {
       nested_data.forEach(function(key) {
         crime_types.push(key.key)
       });
-      console.log(crime_types);
+      // console.log(crime_types);
 
     // Data preprocessing
     var expensesTotal = d3.nest()
@@ -84,7 +86,7 @@ d3.json("playground.json", function(crime_rows) {
                             })
         .object(crime_rows);
 
-  console.log(expensesTotal);
+   // console.log(expensesTotal);
 
     // put label inside as key and return an array
     var data = Object.keys(expensesTotal).map(function(key) {
@@ -93,14 +95,10 @@ d3.json("playground.json", function(crime_rows) {
         return expensesTotal[key];
     });
 
-    console.log(data);
-    // TODO get crime types from labels??
 
-
-    // TODO add data.columns
     data.columns = crime_types;
 
-    console.log(data);
+    // console.log(data);
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -110,7 +108,7 @@ d3.json("playground.json", function(crime_rows) {
                           d.Month = dataParser(d.Month);
                           // d.count = +d.count;
                         });
-    console.log(data);
+    // console.log(data);
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -118,14 +116,13 @@ d3.json("playground.json", function(crime_rows) {
                                 var vals = d3.keys(d).map(function(key){ return key !== 'Month' ? d[key] : 0 });
                                 return d3.max(vals);
                               });
-    console.log(maxDateVal);
+    // console.log(maxDateVal);
     var stack = d3.stack()
                   .keys(crime_types)
-                  .order(d3.stackOrderAscending)
-                  .offset(d3.stackOffsetWiggle);
                   // .order(d3.stackOrderNone);
                   // .offset(d3.stackOffsetWiggle);
-
+                  .order(d3.stackOrderAscending)
+                  .offset(d3.stackOffsetWiggle);
 
     var series = stack(data);
     console.log(series);
@@ -150,26 +147,55 @@ d3.json("playground.json", function(crime_rows) {
         // .curve(d3.curveBasis);
 
 
+   function drawAxis(params){
+
+       // create x axis
+       this.append("g")
+           .classed("axis x", true)
+           .attr('transform', 'translate(0,'+height+')')
+           .call(params.axis.x);
+
+       // create y axis left
+       this.append("g")
+           .classed("axis y", true)
+           .attr('transform', 'translate('+-5+','+20+')')
+           .call(params.axis.y);
+
+       // create y axis right
+       this.append("g")
+           .classed("y axis2", true)
+           .attr('transform', 'translate('+width+','+20+')')
+           .call(params.axis.y2);
+
+      //label of x axis
+       this.select(".axis.x")
+    			 .append("text")
+           .style("fill","black")
+    			 .classed("x axis-label", true)
+           .style("text-anchor", "middle")
+    			 .attr("transform", "translate(" + width/2 + "," + 48 + ")")
+    			 .text("Months");
+
+       this.select(".axis.y")
+     			 .append("text")
+           .style("fill","black")
+     			 .classed("y axis-label", true)
+     			 .attr("transform", "translate(" + -54 + "," + height/3 +  ") rotate(-90)")
+     			 .text("Number of Crimes")
+
+      this.append("g")
+          .append("text")
+          .classed("chart-header",true)
+          .attr("transform", "translate(0,0)")
+          .text("helloo");
+
+
+   }
+
+
 
     function plot(params) {
-
-              // create x axis
-              this.append("g")
-                  .classed("x axis", true)
-                  .attr('transform', 'translate(0,'+height+')')
-                  .call(params.axis.x);
-
-              // create y axis left
-              this.append("g")
-                  .classed("y axis", true)
-                  .attr('transform', 'translate('+-5+','+20+')')
-                  .call(params.axis.y);
-
-              // create y axis right
-              this.append("g")
-                  .classed("y axis2", true)
-                  .attr('transform', 'translate('+width+','+20+')')
-                  .call(params.axis.y2);
+              drawAxis.call(this, params);
 
               // enter
               this.selectAll(".layer")
@@ -185,6 +211,9 @@ d3.json("playground.json", function(crime_rows) {
                  .style("stroke", "black")
                  .style("opacity",0.5)
                  .on("mouseover", function(d,i){
+                   var str = params.data.
+
+                   mousex = d3.mouse(this);
                        d3.select(this)
                          .style("opacity",1)
                  })
