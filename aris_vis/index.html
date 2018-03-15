@@ -20,14 +20,11 @@ var w = 1000;
 var width = w - margin.right- margin.left;
 var height = h- margin.top - margin.bottom;
 
-var tooltip = d3.select("body")
-    .append("div")
-    .attr("class", "remove")
-    .style("position", "absolute")
-    .style("z-index", "20")
-    .style("visibility", "hidden")
-    .style("top", "500px")
-    .style("left", "55px");
+
+var MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
 
 
 // var z = d3.scaleLinear()
@@ -198,7 +195,7 @@ d3.json("playground.json", function(crime_rows) {
           .append("text")
           .classed("chart-header",true)
           .attr("transform", "translate(0,0)")
-          .text("title");
+          .text("");
 
 
    }
@@ -222,16 +219,24 @@ d3.json("playground.json", function(crime_rows) {
                  .style("stroke", "black")
                  .style("opacity",0.5)
                  .on("mousemove", function(d,i){
+                      mousex = d3.mouse(this);
+                      mousex = mousex[0];
+                      var invertedx = x.invert(mousex);
+                      invertedx = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
+                      var selected = (d.values);
+                      var str = d.key+','+'   '+'Date:  '+ invertedx;
+                      d3.select(".chart-header")
+                        .text(str);
 
                        d3.select(this)
                          .style("opacity",1)
-                        tooltip.html( "dsds") .style("visibility", "visible");
+                         .style();
                  })
+
                  .on("mouseout",function(d,i){
                    d3.select(this)
                      .transition()
                      .style("opacity", 0.5);
-                    tooltip.html( "dsds") .style("visibility", "hidden");
                  });
              //exit()
              this.selectAll(".layer")
