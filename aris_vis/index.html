@@ -61,22 +61,14 @@ var stream = svg.append("g")
 
 
 
-
-
-// LOAD CSV DATA
-// d3.csv("aris_dataset.csv", function(crime_rows) {
-
+/////////////////////////////////////////////////////////////////////////////
 // LOAD JSON data
 d3.json("playground.json", function(crime_rows) {
-/////////////////////////////////////////////////////////////////////////////
-
-      // console.log(crime_rows);
 
       var nested_data = d3.nest()
-        .key(function(d) { return d.CrimeType; })
-        .entries(crime_rows);
+                          .key(function(d) { return d.CrimeType; })
+                          .entries(crime_rows);
 
-      // console.log(nested_data);
 
       //crime categories
       var crime_types = []
@@ -84,7 +76,7 @@ d3.json("playground.json", function(crime_rows) {
       nested_data.forEach(function(key) {
         crime_types.push(key.key)
       });
-      // console.log(crime_types);
+
 
     // Data preprocessing
     var expensesTotal = d3.nest()
@@ -94,8 +86,6 @@ d3.json("playground.json", function(crime_rows) {
                             })
         .object(crime_rows);
 
-   // console.log(expensesTotal);
-
     // put label inside as key and return an array
     var data = Object.keys(expensesTotal).map(function(key) {
         expensesTotal[key].Month = key;
@@ -103,20 +93,28 @@ d3.json("playground.json", function(crime_rows) {
         return expensesTotal[key];
     });
 
-
     data.columns = crime_types;
 
-    // console.log(data);
 
 //////////////////////////////////////////////////////////////////////////
 
     //Date parse
     var dataParser = d3.timeParse("%Y-%m");
+
+    var min_month = 12;
+    var min_year = 2015;
     data.forEach(function(d) {
                           d.Month = dataParser(d.Month);
-                          // d.count = +d.count;
+                          var temp = d.Month ;
+
+                          if(temp.getMonth()<min_month && temp.getFullYear()<=min_year ){
+                            min_month = temp.getMonth();
+                          }
+                          if(temp.getFullYear()<min_year){
+                             min_year = temp.getFullYear();
+                          }
+
                         });
-    // console.log(data);
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -128,13 +126,14 @@ d3.json("playground.json", function(crime_rows) {
                                 var vals = d3.keys(d).map(function(key){ return key !== 'Month' ? d[key] : 0 });
                                 return d3.sum(vals);
                               });
-    // console.log(maxDateVal);
+
     var stack = d3.stack()
                   .keys(crime_types)
                   .order(d3.stackOrderNone)
+                  .offset(d3.stackOffsetWiggle);
                   // .offset(d3.stackOffsetWiggle);
                   //.order(d3.stackOrderAscending)
-                  .offset(d3.stackOffsetWiggle);
+
 
     var series = stack(data);
     console.log(series);
@@ -223,17 +222,21 @@ d3.json("playground.json", function(crime_rows) {
                  .style("stroke", "black")
                  .style("opacity",0.5)
                  .on("mousemove", function(d,i){
-                   // console.log(d);
-                   // console.log(i);
 
                       mousex = d3.mouse(this);
                       mousex = mousex[0];
                       var invertedx = x.invert(mousex);
-                      var invertedy = y.invert(mousex);
-                      console.log(invertedy);
+
+
+                      var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month;
+
+                      var amount_of_crimes =d[amount].data[d.key];
+
+
                       invertedx = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
                       var selected = (d.values);
-                      var str = d.key+','+'   '+'Date:  '+ invertedx;
+
+                      var str = d.key+': '+amount_of_crimes+','+'   '+'Date:  '+ invertedx;
                       d3.select(".chart-header")
                         .text(str);
 
@@ -241,16 +244,17 @@ d3.json("playground.json", function(crime_rows) {
                          .style("opacity",1)
                          .style();
                  })
+                .on("mouseout",function(d,i){
+                      d3.select(this)
+                        .transition()
+                        .duration(250)
+                        .style("opacity", 0.5);
 
-                 .on("mouseout",function(d,i){
-                   d3.select(this)
-                     .transition()
-                     .duration(250)
-                     .style("opacity", 0.5);
-                   d3.select(".chart-header")
-                       .text('');
+                      d3.select(".chart-header")
+                        .text('');
                  });
-             //exit()
+
+             //exit
              this.selectAll(".layer")
                  .data(params.layer)
                  .exit()
