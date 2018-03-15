@@ -20,11 +20,22 @@ var w = 1000;
 var width = w - margin.right- margin.left;
 var height = h- margin.top - margin.bottom;
 
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "remove")
+    .style("position", "absolute")
+    .style("z-index", "20")
+    .style("visibility", "hidden")
+    .style("top", "500px")
+    .style("left", "55px");
 
-var z = d3.scaleLinear()
-          // .range(["#51D0D7", "#31B5BB"]);
-          .range(["#51D0D7", "#31B5BB"]);
 
+// var z = d3.scaleLinear()
+//           // .range(["#51D0D7", "#31B5BB"]);
+//           .range(["#51D0D7", "#31B5BB"]);
+//var z= d3.scaleOrdinal(d3.schemeCategory10);
+var z= d3.scaleOrdinal()
+         .range(["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"]);
 
 var x = d3.scaleTime()
           .range([0,width-5]);
@@ -119,9 +130,9 @@ d3.json("playground.json", function(crime_rows) {
     // console.log(maxDateVal);
     var stack = d3.stack()
                   .keys(crime_types)
-                  // .order(d3.stackOrderNone);
+                  .order(d3.stackOrderNone)
                   // .offset(d3.stackOffsetWiggle);
-                  .order(d3.stackOrderAscending)
+                  //.order(d3.stackOrderAscending)
                   .offset(d3.stackOffsetWiggle);
 
     var series = stack(data);
@@ -173,21 +184,21 @@ d3.json("playground.json", function(crime_rows) {
            .style("fill","black")
     			 .classed("x axis-label", true)
            .style("text-anchor", "middle")
-    			 .attr("transform", "translate(" + width/2 + "," + 48 + ")")
+    			 .attr("transform", "translate(" + width/1.9 + "," + 48 + ")")
     			 .text("Months");
 
        this.select(".axis.y")
      			 .append("text")
            .style("fill","black")
      			 .classed("y axis-label", true)
-     			 .attr("transform", "translate(" + -54 + "," + height/3 +  ") rotate(-90)")
+     			 .attr("transform", "translate(" + -56 + "," + height/4 +  ") rotate(-90)")
      			 .text("Number of Crimes")
 
       this.append("g")
           .append("text")
           .classed("chart-header",true)
           .attr("transform", "translate(0,0)")
-          .text("helloo");
+          .text("title");
 
 
    }
@@ -210,18 +221,17 @@ d3.json("playground.json", function(crime_rows) {
                  .style("fill",function(d, i) { return z(i); })
                  .style("stroke", "black")
                  .style("opacity",0.5)
-                 .on("mouseover", function(d,i){
-                   var str = params.data.
+                 .on("mousemove", function(d,i){
 
-                   mousex = d3.mouse(this);
                        d3.select(this)
                          .style("opacity",1)
+                        tooltip.html( "dsds") .style("visibility", "visible");
                  })
                  .on("mouseout",function(d,i){
                    d3.select(this)
                      .transition()
                      .style("opacity", 0.5);
-
+                    tooltip.html( "dsds") .style("visibility", "hidden");
                  });
              //exit()
              this.selectAll(".layer")
