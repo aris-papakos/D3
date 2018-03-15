@@ -3,6 +3,7 @@
 <svg width="960" height="960" font-family="sans-serif" font-size="10"></svg>
 <script src="js/d3.min.js"></script>
 <script src="js/d3-scale-radial.js"></script>
+<script src="http://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
 <style type="text/css">
     .axis {
         stroke: gray
@@ -13,8 +14,9 @@
   display: none;
   min-width: 80px;
   height: auto;
-  background: none repeat scroll 0 0 #ffffff;
+  background: none repeat scroll 0 0 #DCDCDC;
   border: 1px solid #6F257F;
+  border-radius: 15px;
   padding: 14px;
   text-align: center;
 }
@@ -51,9 +53,47 @@
     var y = d3.scaleLinear() //you can try scaleRadial but it scales differently
         .range([innerRadius, outerRadius]);
 
-    var z = d3.scaleOrdinal()
-        .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
+    // var z = d3.scaleOrdinal()
+    //     .range(["#4242f4", "#42c5f4", "#42f4ce", "#42f456", "#adf442", "#f4e242", "#f4a142", "#f44242"]);
+	// var z= d3.scaleOrdinal()
+ //         .range(['#8dd3c7',
+	// 			'#ffffb3',
+	// 			'#bebada',
+	// 			'#fb8072',
+	// 			'#80b1d3']);
+     var z = d3.scaleOrdinal(d3.schemeCategory20c); //needs script d3-scale-chromatic.v0.3.min.js to run!!!
+	// var z= d3.scaleOrdinal()
+ //         .range(['#8dd3c7',
+	// 			'#ffffb3',
+	// 			'#bebada',
+	// 			'#fb8072',
+	// 			'#80b1d3',
+	// 			'#fdb462',
+	// 			'#b3de69',
+	// 			'#fccde5',
+	// 			'#d9d9d9',
+	// 			'#bc80bd',
+	// 			'#ccebc5',
+	// 			'#ffed6f']);
 
+	// var z= d3.scaleOrdinal()
+ //        .range(['#a6cee3',
+	// 			'#1f78b4',
+	// 			'#b2df8a',
+	// 			'#33a02c',
+	// 			'#fb9a99',
+	// 			'#e31a1c',
+	// 			'#fdbf6f',
+	// 			'#ff7f00',
+	// 			'#cab2d6',
+	// 			'#6a3d9a',
+	// 			'#ffff99',
+	// 			'#b15928']);
+
+
+	// var z= d3.scaleLinear()
+	// 	.domain(d3.range(0,14))
+ //         .range(["#B30000", "#FEF0D9"]);
 
 // Load data and go
 d3.json("data/playground.json", function(crime_rows) {
@@ -153,20 +193,17 @@ d3.json("data/playground.json", function(crime_rows) {
             	// alert("And what if I wanna buy a house in London?");
             	d3.selectAll(".rosendaleArc")
 					.transition().duration(200)
-					.style("fill-opacity", 0.5);
+					.style("fill-opacity", 0.6);
 				d3.select(this)
 					.transition().duration(200)
 					.style("fill-opacity", 1);
 
-
-				//TODO divide per year for avg?
 				var crimeType = d3.select(this.parentNode).datum().key;
 	            tooltip
 	              .style("left", d3.event.pageX - 50 + "px")
 	              .style("top", d3.event.pageY - 85 + "px")
 	              .style("display", "inline-block")
 	              .html( crimeType + "<br>" + parseInt((d[1]-d[0])/numYears) +" on average")
-	              //(months[d.data.label-1]) +
 	              ;
 
             })
@@ -174,11 +211,9 @@ d3.json("data/playground.json", function(crime_rows) {
         	d3.selectAll(".rosendaleArc")
 				.transition().duration(200)
 				.style("fill-opacity", 1);
-			// d3.selectAll(".toolTip")
 			tooltip.style("display", "none");
 			})
             ;
-        // debugger;
         var label = g.append("g")
             .selectAll("g")
             .data(data)
