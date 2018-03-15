@@ -1,4 +1,4 @@
-
+//define margin, width and height
 var margin = {top: 100, right: 100, bottom: 100, left: 100},
   width = Math.min(600, window.innerWidth - 10) - margin.left - margin.right,
   height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
@@ -11,15 +11,19 @@ function RadarChart(id, data) {
 	 margin: margin, //The margins of the SVG
 	 levels: 0,				//How many levels or inner circles should there be drawn
 	 maxValue: 0,			//What is the value that the biggest circle will represent
-	 labelFactor: 1.25, 	//How much farther than the radius of the outer circle should the labels be placed
-	 wrapWidth: 90, 		//The number of pixels after which a label needs to be given a new line
+	 labelFactor: 1.30, 	//How much farther than the radius of the outer circle should the labels be placed
+	 wrapWidth: 70, 		//The number of pixels after which a label needs to be given a new line
 	 opacityArea: 0.35, 	//The opacity of the area of the blob
 	 dotRadius: 5, 			//The size of the colored circles of each blob
-	 opacityCircles: 0.1, 	//The opacity of the circles of each blob
+	 opacityCircles: 0.2, 	//The opacity of the circles of each blob
 	 strokeWidth: 2, 		//The width of the stroke around each blob
 	 roundStrokes: true,	//If true the area and stroke will follow a round path (cardinal-closed)
-	 color: d3.scaleOrdinal(d3.schemeCategory10).domain(d3.range(0, 10))	//Color function
+	 //color: d3.scaleOrdinal(d3.schemeCategory20c).domain(d3.range(0, 10))	//Color function
+   color: d3.scaleOrdinal(["#1f77b4","#98df8a"])	//Color function
 	};
+
+
+
 
 	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
 	var maxValue = Math.ceil((Math.max(cfg.maxValue, d3.max(data, function(i){return d3.max(i.map(function(o){return o.value;}))})) * 10)) / 10;
@@ -72,8 +76,8 @@ function RadarChart(id, data) {
 		.append("circle")
 		.attr("class", "gridCircle")
 		.attr("r", function(d, i){return radius/cfg.levels*d;})
-		.style("fill", "#CDCDCD")
-		.style("stroke", "#CDCDCD")
+		.style("fill", "grey")
+    .style("stroke", "grey")
 		.style("fill-opacity", cfg.opacityCircles)
 		.style("filter" , "url(#glow)");
 
@@ -82,11 +86,12 @@ function RadarChart(id, data) {
 	   .data(d3.range(1,(cfg.levels+1)).reverse())
 	   .enter().append("text")
 	   .attr("class", "axisLabel")
-	   .attr("x", 4)
+	   .attr("x", 5)
 	   .attr("y", function(d){return -d*radius/cfg.levels;})
 	   .attr("dy", "0.4em")
 	   .style("font-size", "10px")
-	   .attr("fill", "#737373")
+     .style("font-weight", "bold")
+	   .attr("fill", "#black")
 	   .text(function(d,i) { return Format(maxValue * d/cfg.levels);});
 
 
@@ -111,7 +116,8 @@ function RadarChart(id, data) {
 	//Append the labels at each axis
 	axis.append("text")
 		.attr("class", "legend")
-		.style("font-size", "11px")
+		.style("font-size", "12px")
+    .style("font-weight", "bold")
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
 		.attr("x", function(d, i){ return rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
@@ -252,6 +258,6 @@ function wrap(text, width) {
     }
   }
   });
-}//wrap
+}
 
-}//RadarChart
+}

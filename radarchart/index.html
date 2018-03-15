@@ -61,21 +61,33 @@
 
 			//Average crime data of London (Dummy Data)
 			var londonAVG = [//London Average
-			{key: 'Anti-social behaviour', value:0.15},
-			{key: 'Violence and sexual offences', value:0.15},
-			{key: 'Other theft', value:0.09},
-			{key: 'Vehicle crime', value:0.35},
-			{key: 'Burglary', value:0.2},
-			{key: 'Criminal damage and arson', value:0.2},
-			{key: 'Public order', value:0.12},
-			{key: 'Shoplifting', value:0.2},
-			{key: 'Theft from the person', value:0.2},
-			{key: 'Drugs', value:0.2},
-			{key: 'Robbery', value:0.44},
-			{key: 'Bicycle theft', value:0.2},
-			{key: 'Other crime', value:0.2},
-			{key: 'Possession of weapons', value:0.2}
+			{key: 'Anti-social behaviour', value:0.23},
+			{key: 'Violence and sexual offences', value:0.21},
+			{key: 'Other theft', value:0.11},
+			{key: 'Vehicle crime', value:0.09},
+			{key: 'Burglary', value:0.07},
+			{key: 'Criminal damage and arson', value:0.06},
+			{key: 'Public order', value:0.05},
+			{key: 'Shoplifting', value:0.05},
+			{key: 'Theft from the person', value:0.04},
+			{key: 'Drugs', value:0.03},
+			{key: 'Robbery', value:0.03},
+			{key: 'Bicycle theft', value:0.02},
+			{key: 'Other crime', value:0.01},
+			{key: 'Possession of weapons', value:0.01}
 		];
+
+		//Sort crimes based on top crimes of area of interest
+		function compare(a,b) {
+			if (b.value - a.value > 0)
+				return 1;
+			if (b.value - a.value < 0)
+				return -1;
+			return 0;}
+
+
+
+		data.sort(compare);
 
 		//Only choose categories of London Average that are in the query data
 		var londonArray = []
@@ -93,15 +105,7 @@
 		dataArray.push(londonArray);
 
 
-			//Sort crimes based on top crimes of area of interest
-			function compare(a,b) {
-				if (b.value - a.value > 0)
-					return 1;
-			  if (b.value - a.value < 0)
-			    return -1;
-			  return 0;}
-
-			dataArray[0].sort(compare);
+			//dataArray[0].sort(compare);
 
 			//Show only top 6 crime categories (or less)
 			dataArray[0].splice(6)
@@ -112,11 +116,9 @@
 			RadarChart(".RadarChart", dataArray);
 
 
-
-
 //Create missing Legend
 
-var colorscale = d3.scaleOrdinal(d3.schemeCategory10);
+var colorscale = d3.scaleOrdinal(["#1f77b4","#98df8a"])
 
 //Legend titles
 var LegendOptions = ['Area of Interest', 'London Average'];
