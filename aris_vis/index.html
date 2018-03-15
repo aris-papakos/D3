@@ -223,10 +223,14 @@ d3.json("playground.json", function(crime_rows) {
                  .style("stroke", "black")
                  .style("opacity",0.5)
                  .on("mousemove", function(d,i){
-                   console.log(d);
+                   // console.log(d);
+                   // console.log(i);
+
                       mousex = d3.mouse(this);
                       mousex = mousex[0];
                       var invertedx = x.invert(mousex);
+                      var invertedy = y.invert(mousex);
+                      console.log(invertedy);
                       invertedx = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
                       var selected = (d.values);
                       var str = d.key+','+'   '+'Date:  '+ invertedx;
@@ -241,7 +245,10 @@ d3.json("playground.json", function(crime_rows) {
                  .on("mouseout",function(d,i){
                    d3.select(this)
                      .transition()
+                     .duration(250)
                      .style("opacity", 0.5);
+                   d3.select(".chart-header")
+                       .text('');
                  });
              //exit()
              this.selectAll(".layer")
