@@ -65,7 +65,8 @@ module.exports = (function() {
             key             : 'AIzaSyArEJJyNfw0ti1iYhe4EQro0y_j0wNtVDY',
             origin          : (result[0].geometry.coordinates[1] + ',' + result[0].geometry.coordinates[0]).toString(),
             destination     : (result[1].geometry.coordinates[1] + ',' + result[1].geometry.coordinates[0]).toString(),
-            model           : req.query.mode
+            mode            : req.query.mode,
+            avoid           : 'highways'
         };
 
         request({

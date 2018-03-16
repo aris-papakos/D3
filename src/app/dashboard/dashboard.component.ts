@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit {
   private alive                     : boolean = true;
   wardNames                         = [];
   modeNames                         = [
-    'Walking', 'Cycling', 'Public Transport', 'Car'
+    'walking', 'bicycling', 'transit', 'driving'
   ]
 
   selectHome                        = new FormControl();
