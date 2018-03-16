@@ -1,21 +1,54 @@
 <div class="container" fxLayout="row">
-  <div class="pane padding" fxFlex fxLayout="row wrap">
-    <span class="text-line">I live in the </span>
+  <div class="pane padding" fxFlex>
 
-    <form>
-      <mat-form-field class="text-form">
-        <input type="text" aria-label="Ward" matInput
-          [formControl]="wardControl"
-          [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{ option }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+    <form fxLayout="column">
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I live in the </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Home" matInput
+            [formControl]="selectHome"
+            [matAutocomplete]="home">
+          <mat-autocomplete #home="matAutocomplete">
+            <mat-option *ngFor="let option of filteredHome | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <span class="text-line">ward.</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I work in the </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Work" matInput
+            [formControl]="selectWork"
+            [matAutocomplete]="work">
+          <mat-autocomplete #work="matAutocomplete">
+            <mat-option *ngFor="let option of filteredWork | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <span class="text-line">ward.</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I usually travel by </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Work" matInput
+            [formControl]="selectTravel"
+            [matAutocomplete]="travel">
+          <mat-autocomplete #travel="matAutocomplete">
+            <mat-option *ngFor="let option of filteredTravel | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+
     </form>
 
-    <span class="text-line">ward</span>
 
   </div>
 

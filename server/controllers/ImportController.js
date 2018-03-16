@@ -1,9 +1,11 @@
 // app/controllers/ImportController.js
 const Lsoa                = require('../models/lsoa');
 const Ward                = require('../models/ward');
+const Crime               = require('../models/crime')
 
 const async               = require('async');
 const parse               = require('csv-parse');
+const csv                 = require('csv-parser');
 const fs                  = require('fs');
 
 const mongoose            = require('mongoose');
@@ -123,6 +125,114 @@ module.exports = (function() {
         return res.send('imported ' + wardsGeo.features.length + ' wards');
       });
     },
+    crime: function(req, res, next) {
+
+      fs.readdir('./server/assets/crimes', (err, months) => {
+        async.eachSeries(months, function(month, callback) {
+          console.log('importing ' + month);
+
+          async.waterfall([
+            function(callback) {
+              console.log('importing city');
+              if (fs.existsSync('./server/assets/crimes/' + month +'/' + month + '-city-of-london-street.csv')) {
+                fs.createReadStream('./server/assets/crimes/' + month +'/' + month + '-city-of-london-street.csv')
+                  .pipe(csv())
+                  .on('data', function (data) {
+                    if (data.Latitude != '' && data.Longitude != '') {
+                      var dateSplit = data['Month'].split('-');
+                      var date = new Date()
+                      date.setYear(dateSplit[0]);
+                      date.setMonth(dateSplit[1] - 1);
+                      date.setDate(1);
+                      date.setHours(0);
+                      date.setMinutes(0);
+                      date.setSeconds(0);
+                      date.setMilliseconds(0);
+
+
+                      var crime = new Crime({
+                        geometry              : {
+                          coordinates: [data['Longitude'], data['Latitude']]
+                        },
+                        properties            :{
+                          crimeId								: data['Crime ID'],
+                          date									: {
+                            raw										: data['Month'],
+                            dateString						: date
+                          },
+                          reportedBy						: data['Reported by'],
+                          fallsWithin						: data['Falls within'],
+                          crimeType							: data['Crime type'],
+                          outcome								: data['Last outcome category'],
+                          street                : data['Location'],
+                        }
+                      }).save();
+                    }
+                  })
+                  .on('end', function () {
+                    callback();
+                  })
+                } else {
+                  callback();
+                }
+            },
+            function(callback) {
+              console.log('importing metro');
+              if (fs.existsSync('./server/assets/crimes/' + month +'/' + month + '-metropolitan-street.csv')) {
+                fs.createReadStream('./server/assets/crimes/' + month +'/' + month + '-metropolitan-street.csv')
+                  .pipe(csv())
+                  .on('data', function (data) {
+                    if (data.Latitude != '' && data.Longitude != '') {
+                      var dateSplit = data['Month'].split('-');
+                      var date = new Date()
+                      date.setYear(dateSplit[0]);
+                      date.setMonth(dateSplit[1] - 1);
+                      date.setDate(1);
+                      date.setHours(0);
+                      date.setMinutes(0);
+                      date.setSeconds(0);
+                      date.setMilliseconds(0);
+
+                      var crime = new Crime({
+                        geometry              : {
+                          coordinates: [data['Longitude'], data['Latitude']]
+                        },
+                        properties            :{
+                          crimeId								: data['Crime ID'],
+                          date									: {
+                            raw										: data['Month'],
+                            dateString						: date
+                          },
+                          reportedBy						: data['Reported by'],
+                          fallsWithin						: data['Falls within'],
+                          crimeType							: data['Crime type'],
+                          outcome								: data['Last outcome category'],
+                          street                : data['Location'],
+                        }
+                      }).save();
+                    }
+                  })
+                  .on('end', function () {
+                    callback();
+                  })
+              } else {
+                callback();
+              }
+            },
+          ], function(err) {
+            if (err) console.error(err);
+            console.log('done with ' + month);
+            callback();
+          });
+        }, function(err) {
+          if (err) console.error(err);
+
+          console.log('all done');
+        });
+      });
+
+    }
+
   }
 
 })();

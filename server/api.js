@@ -10,10 +10,13 @@ const router              = express.Router();
 
 // ============================= IMPORT =============================
 // router.get('/import/lsoa', ImportController.lsoa);
+router.get('/import/crime', ImportController.crime);
 // router.get('/import/wards', ImportController.wards);
 
+
 // ============================= CRIME ==============================
-router.get('/crime/get', CrimeController.get);
+router.get('/crime/getWard', CrimeController.getWard);
+router.get('/crime/getRoute', CrimeController.getRoute);
 
 // ============================== WARD ==============================
 router.get('/ward/get', WardsController.get);

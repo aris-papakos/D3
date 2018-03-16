@@ -3,6 +3,7 @@ const bodyParser          = require('body-parser');
 const express             = require('express');
 const http                = require('http');
 const mongoose            = require('mongoose');
+const morgan              = require('morgan');
 const path                = require('path');
 
 
@@ -17,6 +18,9 @@ mongoose.connect(database.url);
 // Parsers for POST data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Log to command line
+app.use(morgan('dev'));
 
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -34,6 +38,7 @@ app.use('/api', api);
 // Catch all other routes and return the index file
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/index.html'));
+  // res.sendFile(path.join(__dirname, 'src/index.html'));
 });
 
 // Get port from environment and store in Express.

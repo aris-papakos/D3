@@ -1,7 +1,7 @@
 import { Injectable }               from '@angular/core';
 import { Http, Response,
   Headers, RequestOptions }         from '@angular/http';
-import {Observable}                 from 'rxjs/Rx';
+import { Observable }               from 'rxjs/Rx';
 import { Subject }                  from 'rxjs/Subject';
 
 import 'rxjs/add/operator/map';
@@ -11,7 +11,9 @@ import 'rxjs/add/operator/catch';
 export class DataService {
 
   private wardNames = new Subject<any>();
+  private features = new Subject<any>();
   wardNames$ = this.wardNames.asObservable();
+  features$ = this.features.asObservable();
 
   constructor(private http: Http) { }
 
@@ -24,9 +26,18 @@ export class DataService {
   }
 
   getCrime(ward: any): Observable<any> {
-    console.log(ward)
-    return this.http.get('http://localhost:3000/api/crime/get', {
+    return this.http.get('http://localhost:3000/api/crime/getWard', {
       params: { ward: ward }
+    })
+    .map((res:any) => res.json())
+    .catch((error:any) => {
+      return Observable.throw(error);
+    });
+  }
+
+  getRoute(mode: string, home: any, work: any): Observable<any> {
+    return this.http.get('http://localhost:3000/api/crime/getRoute', {
+      params: { mode: mode, home: home, work: work }
     })
     .map((res:any) => res.json())
     .catch((error:any) => {
@@ -40,7 +51,16 @@ export class DataService {
   }
 
   getWardNames() {
-    return this.wardNames
+    return this.wardNames;
+  }
+
+  // FEATURES
+  setFeatures(features) {
+    this.features.next(features);
+  }
+
+  getFeatures() {
+    return this.features;
   }
 
 }
