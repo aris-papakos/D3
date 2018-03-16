@@ -33,6 +33,11 @@ export class DashboardComponent implements OnInit {
   modeTravel                        : string;
 
   featureCollection                 = {};
+  crimeList                         = {
+    asbo                              : 0,
+    shoplifting                       : 0,
+    robbery                           : 0,
+  }
 
 
   constructor(private dataService: DataService) {
@@ -40,6 +45,29 @@ export class DashboardComponent implements OnInit {
 
       for (let i = 0; i < wardNames.length; i++) {
         this.wardNames.push(wardNames[i])
+      }
+    });
+
+    dataService.features$.takeWhile(() => this.alive).subscribe(features=> {
+
+      for (let x in this.crimeList) {
+        this.crimeList[x] = 0;
+      }
+
+      for (let x in features) {
+        for (let i = 0; i < features[x].length; i++) {
+          let feature = features[x][i];
+
+          if (feature.properties.crimeType == 'Anti-social behaviour') {
+            this.crimeList.asbo += 1;
+          }
+          else if (feature.properties.crimeType == 'Shoplifting') {
+            this.crimeList.shoplifting += 1;
+          }
+          else if (feature.properties.crimeType == 'Robbery') {
+            this.crimeList.robbery += 1;
+          }
+        }
       }
     });
   }
