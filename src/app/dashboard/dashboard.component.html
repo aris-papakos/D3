@@ -1,7 +1,7 @@
 <div class="container" fxLayout="row">
-  <div class="pane padding" fxFlex>
+  <div class="pane padding" fxLayout="column" fxFlex>
 
-    <form fxLayout="column">
+    <form fxFlex fxLayout="column">
 
       <div class="form-row" fxLayout="row wrap">
         <span class="text-line">I live in the </span>
@@ -16,6 +16,9 @@
           </mat-autocomplete>
         </mat-form-field>
         <span class="text-line">ward.</span>
+        <a [routerLink]="['/details', 'home']">
+          <i class="material-icons">details</i>
+        </a>
       </div>
 
       <div class="form-row" fxLayout="row wrap">
@@ -31,6 +34,9 @@
           </mat-autocomplete>
         </mat-form-field>
         <span class="text-line">ward.</span>
+        <a [routerLink]="['/details']">
+          <i class="material-icons">details</i>
+        </a>
       </div>
 
       <div class="form-row" fxLayout="row wrap">
@@ -45,38 +51,37 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
-      </div>
-
-      <div class="form-row" fxLayout="row wrap">
-        <span class="text-line">ADD MORE OPTIONS</span>
+        <a [routerLink]="['/details']">
+          <i class="material-icons">details</i>
+        </a>
       </div>
 
     </form>
 
+    <div class="padding" fxFlex fxLayout="column">
 
-  </div>
+      <span class="text-line">In the last 90 days...</span>
 
-  <div class="pane padding" fxFlex fxLayout="column">
-    <span class="text-line">In the last 90 days...</span>
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.robbery">
+        <span class="text-line">{{ crimeList.robbery }} </span>
+        <span class="text-line">people got robbed</span>
+      </div>
 
-    <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.robbery">
-      <span class="text-line">{{ crimeList.robbery }} </span>
-      <span class="text-line">people got robbed</span>
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
+        <span class="text-line">{{ crimeList.shoplifting }} </span>
+        <span class="text-line">reports of shoplifting</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
+        <span class="text-line">{{ crimeList.asbo }} </span>
+        <span class="text-line">reports of Anti Social Behaviour</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">ADD MORE</span>
+      </div>
     </div>
 
-    <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
-      <span class="text-line">{{ crimeList.shoplifting }} </span>
-      <span class="text-line">reports of shoplifting</span>
-    </div>
-
-    <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
-      <span class="text-line">{{ crimeList.asbo }} </span>
-      <span class="text-line">reports of Anti Social Behaviour</span>
-    </div>
-
-    <div class="form-row" fxLayout="row wrap">
-      <span class="text-line">ADD MORE</span>
-    </div>
   </div>
 
   <div class="pane" fxFlex="50">

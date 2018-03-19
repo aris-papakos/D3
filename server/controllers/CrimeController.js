@@ -24,12 +24,14 @@ module.exports = (function() {
         Crime.find({
           $and :[
             { 'geometry': { $geoWithin: { $geometry: ward.geometry } } },
-            { 'properties.date.dateString': { '$gte': date } }
+            // { 'properties.date.dateString': { '$gte': date } }
           ]
         })
 
         .exec(function(err, crimes) {
           if (err) console.error(err);
+
+          console.log(crimes.length);
 
           res.status(200).json(crimes)
         });

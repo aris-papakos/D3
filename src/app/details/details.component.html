@@ -1,0 +1,39 @@
+<div class="container" fxLayout="column">
+
+  <div fxFlex fxLayout="row">
+
+    <div fxFlex>
+
+      <div class="leaflet"
+           leaflet
+           [leafletOptions]="options"
+           [leafletLayers]="layers"
+           [leafletFitBounds]="fitBounds">
+      </div>
+
+    </div>
+    <div fxFlex>
+
+      <app-radial></app-radial>
+
+    </div>
+
+  </div>
+
+  <div fxFlex fxLayout="row">
+
+    <div fxFlex>
+
+      <app-stream></app-stream>
+
+    </div>
+    <div fxFlex>
+
+      <app-radar></app-radar>
+
+    </div>
+
+  </div>
+
+
+</div>

@@ -12,16 +12,24 @@ import { LeafletModule }            from '@asymmetrik/ngx-leaflet';
 
 import { AppComponent }             from './app.component';
 import { DashboardComponent }       from './dashboard/dashboard.component';
+import { DetailsComponent }         from './details/details.component'
 import { LeafletComponent }         from './dashboard/leaflet/leaflet.component';
 
 import { D3Service }                from 'd3-ng2-service';
-import { DataService }              from './services/data.service'
+import { DataService }              from './services/data.service';
+import { RadialComponent } from './details/radial/radial.component';
+import { StreamComponent } from './details/stream/stream.component';
+import { RadarComponent } from './details/radar/radar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LeafletComponent,
     DashboardComponent,
+    DetailsComponent,
+    RadialComponent,
+    StreamComponent,
+    RadarComponent,
   ],
   imports: [
     AppMaterialModule,

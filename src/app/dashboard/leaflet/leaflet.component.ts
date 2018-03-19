@@ -32,12 +32,10 @@ export class LeafletComponent implements OnInit {
     this.cartoLayer,
     this.crimeLayer
   ]
-  fitBounds = null;
-
+  fitBounds:any = null;
 
   // COLLECTIONS
   wards = {};
-  // private crimeList                 = new Subject<any>();
 
   constructor(private dataService: DataService, private changeDetector: ChangeDetectorRef) {
     dataService.features$.takeWhile(() => this.alive).subscribe(features=> {
@@ -63,7 +61,7 @@ export class LeafletComponent implements OnInit {
 
       this.crimeLayer.clearLayers();
       combinedLayer.addTo(this.crimeLayer);
-      // this.crimeList.next(combinedLayer)
+      this.fitBounds = this.crimeLayer.getBounds();
     });
 
   }
@@ -80,12 +78,6 @@ export class LeafletComponent implements OnInit {
 
       this.dataService.setWardNames(names);
     });
-
-    // this.crimeList.subscribe(value => {
-    //   console.log(value);
-  	// 	this.fitBounds = value.getBounds();
-    //   this.changeDetector.detectChanges();
-    // })
   }
 
   ngOnDestroy() {

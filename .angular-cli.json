@@ -23,7 +23,9 @@
         "styles.css",
         "../node_modules/leaflet/dist/leaflet.css"
       ],
-      "scripts": [],
+      "scripts": [
+        "./assets/js/radarchart.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

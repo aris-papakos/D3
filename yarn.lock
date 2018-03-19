@@ -1246,9 +1246,16 @@
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/d3-color/-/d3-color-1.0.5.tgz#cad755f0fc6de7b70fa6e5e08afa81ef4c2248de"
 
-"@types/d3-contour@*", "@types/d3-contour@1.1":
+"@types/d3-contour@*":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@types/d3-contour/-/d3-contour-1.1.2.tgz#8b1597f45bbb5c178c4aa9035d1d1fe8fd92d9c4"
+  dependencies:
+    "@types/d3-array" "*"
+    "@types/geojson" "*"
+
+"@types/d3-contour@1.2":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@types/d3-contour/-/d3-contour-1.2.1.tgz#03d4f9849f8b99f841d2adf6f59b2dcf06987178"
   dependencies:
     "@types/d3-array" "*"
     "@types/geojson" "*"
@@ -2931,9 +2938,9 @@ d3-color@1, d3-color@1.0, d3-color@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/d3-color/-/d3-color-1.0.3.tgz#bc7643fca8e53a8347e2fbdaffa236796b58509b"
 
-d3-contour@1.1:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/d3-contour/-/d3-contour-1.1.2.tgz#21f5456fcf57645922d69a27a58e782c91f842b3"
+d3-contour@1.2:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/d3-contour/-/d3-contour-1.2.0.tgz#de3ea7991bbb652155ee2a803aeafd084be03b63"
   dependencies:
     d3-array "^1.1.1"
 
@@ -2995,9 +3002,9 @@ d3-interpolate@1, d3-interpolate@1.1, d3-interpolate@1.1.6:
   dependencies:
     d3-color "1"
 
-d3-ng2-service@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/d3-ng2-service/-/d3-ng2-service-2.0.0.tgz#6d08d8a2fa6fe20d3813672e7e156af3f9fc2d61"
+d3-ng2-service@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/d3-ng2-service/-/d3-ng2-service-2.1.0.tgz#1d56f6adda9f96b1eac62a28f8492bca766942a3"
   dependencies:
     "@types/d3-array" "1.2"
     "@types/d3-axis" "1.0"
@@ -3005,7 +3012,7 @@ d3-ng2-service@^2.0.0:
     "@types/d3-chord" "1.0"
     "@types/d3-collection" "1.0"
     "@types/d3-color" "1.0"
-    "@types/d3-contour" "1.1"
+    "@types/d3-contour" "1.2"
     "@types/d3-dispatch" "1.0"
     "@types/d3-drag" "1.2"
     "@types/d3-dsv" "1.0"
@@ -3036,7 +3043,7 @@ d3-ng2-service@^2.0.0:
     d3-chord "1.0"
     d3-collection "1.0"
     d3-color "1.0"
-    d3-contour "1.1"
+    d3-contour "1.2"
     d3-dispatch "1.0"
     d3-drag "1.2"
     d3-dsv "1.0"
@@ -3091,7 +3098,7 @@ d3-request@1.0.6:
     d3-dsv "1"
     xmlhttprequest "1"
 
-d3-scale-chromatic@1.2:
+d3-scale-chromatic@1.2, d3-scale-chromatic@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/d3-scale-chromatic/-/d3-scale-chromatic-1.2.0.tgz#25820d059c0eccc33e85f77561f37382a817ab58"
   dependencies:

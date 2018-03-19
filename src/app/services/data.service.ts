@@ -15,6 +15,8 @@ export class DataService {
   wardNames$ = this.wardNames.asObservable();
   features$ = this.features.asObservable();
 
+  featuresRaw = {}
+
   constructor(private http: Http) { }
 
   getWards(): Observable<any> {
@@ -51,16 +53,17 @@ export class DataService {
   }
 
   getWardNames() {
-    return this.wardNames;
+    return this.wardNames$;
   }
 
   // FEATURES
   setFeatures(features) {
     this.features.next(features);
+    this.featuresRaw = features;
   }
 
   getFeatures() {
-    return this.features;
+    return this.features$;
   }
 
 }
