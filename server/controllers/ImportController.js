@@ -1,7 +1,9 @@
 // app/controllers/ImportController.js
-const Lsoa                = require('../models/lsoa');
 const Ward                = require('../models/ward');
+const Location            = require('../models/location')
 const Crime               = require('../models/crime')
+const Report              = require('../models/report')
+
 
 const async               = require('async');
 const parse               = require('csv-parse');
@@ -14,76 +16,6 @@ module.exports = (function() {
 
   return {
 
-    lsoa: function(req, res, next) {
-      let londonLsoa      = [];
-      let londonGeo       = {};
-      let LondonPostcodes = [];
-      let londonFiltered  = [];
-
-      async.waterfall([
-        // CRIME LSOA
-        function(callback) {
-          console.log('crime lsoa');
-          let parser = parse({delimiter: ','}, function (err, data) {
-            async.eachOf(data, function (line, index, callback) {
-              if (index == 0) callback();
-              else {
-                londonLsoa.push(line[1]);
-                callback();
-              }
-            }, function(err) {
-              if (err) console.error(err);
-
-              console.log(londonLsoa.length);
-              callback(null);
-            });
-          });
-
-          fs.createReadStream('./server/assets/lsoa.csv').pipe(parser);
-        },
-        function(callback) {
-          console.log('total lsoa');
-          fs.readFile('./server/assets/lsoa.geojson', 'utf8', function (err, data) {
-            if (err) console.error(err);
-
-            londonGeo = JSON.parse(data);
-            console.log(londonGeo.features.length);
-            callback(null);
-          });
-        },
-        function(callback) {
-          console.log('filter lsoa');
-          async.each(londonGeo.features, function (feature, callback) {
-            if (londonLsoa.indexOf(feature.properties['LSOA11CD']) === -1) {
-              callback();
-            } else {
-
-              postcodeIndex = LondonPostcodes.map(function(postcode) {
-                return postcode.lsoa;
-              }).indexOf(feature.properties['LSOA11CD']);
-
-              let lsoa = new Lsoa({
-                'type'          : 'Feature',
-                'properties'    : feature.properties,
-                'geometry'      : feature.geometry
-              })
-              lsoa.save(function(err) {
-                if (err) console.error(err);
-
-                callback();
-              });
-            }
-          }, function(err) {
-            callback(null);
-          });
-        }
-      ], function(err, result) {
-        if (err) console.error(err);
-        console.log('all done');
-
-        return res.send(LondonPostcodes);
-      });
-    },
     wards: function(req, res, next) {
       let wardsGeo        = {};
 
@@ -229,6 +161,83 @@ module.exports = (function() {
 
           console.log('all done');
         });
+      });
+
+    },
+    crimeNested: function(req, res, next) {
+
+      Ward.find({})
+      .exec(function(err, wards) {
+        if (err) console.error(err);
+
+        async.eachSeries(wards, function(ward, callback) {
+
+          console.log('starting ' + ward.properties.name);
+
+          Crime.find({
+            'geometry': { $geoWithin: { $geometry: ward.geometry } }
+          })
+          .exec(function(err, crimes) {
+            if (err) console.error(err);
+
+            async.eachSeries(crimes, function(crime, callback) {
+
+
+              var report = new Report({
+                crimeId								: crime.properties.crimeId,
+                date									: crime.properties.date,
+                reportedBy						: crime.properties.reportedBy,
+                fallsWithin						: crime.properties.fallsWithin,
+                crimeType							: crime.properties.crimeType,
+                outcome								: crime.properties.outcome
+              }).save(function(err, savedReport) {
+                if (err) console.error(err);
+
+                Location.findOne({
+                  'geometry.coordinates': crime.geometry.coordinates
+                })
+                .exec(function(err, location) {
+                  if (err) console.error(err);
+
+                  if (!location) {
+                    location = new Location({
+                      geometry        : {
+                        coordinates     : crime.geometry.coordinates
+                      },
+                      properties      :{
+                        description     : crime.properties.street,
+                        crimes          : [ savedReport._id ]
+                      }
+                    }).save(function(err, savedCrime) {
+                      if (err) console.error(err);
+
+                      callback();
+                    });
+                  } else {
+                    location.properties.crimes.push(savedReport._id)
+                    location.save(function(err, savedLocation) {
+                      if (err) console.error(err);
+
+                      callback();
+                    });
+                  }
+                });
+
+              });
+            }, function(err) {
+              if (err) console.error(err);
+
+              console.log(ward.properties.name + ' done');
+              callback();
+            });
+          });
+
+        }, function(err) {
+          if (err) console.error(err);
+
+          res.status(200).json('done!')
+        });
+
       });
 
     }

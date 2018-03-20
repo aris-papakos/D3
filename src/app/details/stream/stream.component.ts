@@ -15,11 +15,12 @@ export class StreamComponent implements OnInit, AfterViewInit {
   private d3: D3;
   private parentNativeElement: any;
 
+  svg:any;
+
   constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
   }
-
 
   ngOnInit() {
 
@@ -28,17 +29,18 @@ export class StreamComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // D3
     let d3 = this.d3;
-    let stream = {}
 
     //Stream
+    var parent = this.parentNativeElement.querySelector('.stream');
+
     this.svg = d3.select('.stream').append('svg:svg')
     .attr('id', 'chart')
-    .attr('width', d3.select('.stream').node().getBoundingClientRect().width)
-    .attr('height', d3.select('.stream').node().getBoundingClientRect().height)
+    .attr('width', parent.offsetWidth)
+    .attr('height', parent.offsetHeight)
 
     let margin = { top: 20, right: 20, bottom: 60, left: 60 };
-    let width = d3.select('.stream').node().getBoundingClientRect().width - margin.right- margin.left;
-    let height = d3.select('.stream').node().getBoundingClientRect().height - margin.top - margin.bottom;
+    let width = parent.offsetWidth - margin.right- margin.left;
+    let height = parent.offsetHeight - margin.top - margin.bottom;
 
     let MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
@@ -48,13 +50,13 @@ export class StreamComponent implements OnInit, AfterViewInit {
     var x = d3.scaleTime().range([0,width-5]);
     var y = d3.scaleLinear().range([height-20,0]);
 
-    var xAxis = d3.axisBottom()
+    var xAxis = d3.axisBottom(x)
       .scale(x)
       .ticks(10);
-    var yAxis = d3.axisLeft()
+    var yAxis = d3.axisLeft(y)
       .scale(y)
       .ticks(5);
-    var yAxis_right = d3.axisRight()
+    var yAxis_right = d3.axisRight(y)
       .scale(y)
       .ticks(5);
 
@@ -65,7 +67,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
 /////////////////////////////////////////////////////////////////////////////
 
     var nested_data = d3.nest()
-      .key(function(d) { return d.properties.crimeType; })
+      .key(function(d) { return d['properties']['crimeType']; })
       .entries(this.dataService.featuresRaw['home']);
 
     //crime categories
@@ -75,9 +77,9 @@ export class StreamComponent implements OnInit, AfterViewInit {
     });
 
     var expensesTotal = d3.nest()
-      .key(function(d) { return d.properties.date.raw; })
-      .key(function(d) { return d.properties.crimeType; })
-      .rollup(function(v) { return v.length; })
+      .key(function(d) { return d['properties']['date']['raw']; })
+      .key(function(d) { return d['properties']['crimeType']; })
+      .rollup(function(v:any) { return v.length })
       .object(this.dataService.featuresRaw['home']);
 
     // put label inside as key and return an array
@@ -92,7 +94,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
       expensesTotal[key].Month = key;
       return expensesTotal[key];
     });
-    data.columns = crime_types;
+    data['columns'] = crime_types;
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -129,12 +131,13 @@ export class StreamComponent implements OnInit, AfterViewInit {
     x.domain(d3.extent(data, function (d) {
       return d.Month;
     }));
-    y.domain([0,maxY]);// todo----see it---make it DYNAMIC
+    y.domain([0, maxY]);
 
-    var xAxis = d3.axisBottom()
+    var xAxis = d3.axisBottom(x)
       .scale(x);
+
     var area = d3.area()
-     .x(function(d) { return x(d.data.Month); })
+     .x(function(d) { return x(d['data']['Month']); })
      .y0(function(d) { return y(d[0]); })
      .y1(function(d) { return y(d[1]); })
      .curve(d3.curveCardinal);
@@ -181,7 +184,6 @@ export class StreamComponent implements OnInit, AfterViewInit {
 
 /////////////////////////////////////////////////////////////////////////////
 
-
     function plot(params) {
       drawAxis.call(this, params);
       // enter
@@ -197,18 +199,17 @@ export class StreamComponent implements OnInit, AfterViewInit {
         .style("stroke", "black")
         .style("opacity",0.5)
       .on("mousemove", function(d,i){
-         let mousex = d3.mouse(this)[0];
-         var invertedx = x.invert(mousex);
-         var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month;
-         var amount_of_crimes =d[amount].data[d.key];
-         invertedx = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
-         var selected = (d.values);
-         var str = d.key+': '+amount_of_crimes+','+'   '+'Date:  '+ invertedx;
-         d3.select(".chart-header")
-           .text(str);
-          d3.select(this)
-            .style("opacity",1)
-            .style();
+        let mousex = d3.mouse(this)[0];
+        var invertedx = x.invert(mousex);
+        var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month;
+        var amount_of_crimes =d[amount].data[d.key];
+        let invertedDate = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
+        var selected = (d.values);
+        var str = d.key+': '+amount_of_crimes+','+'   '+'Date:  '+ invertedDate;
+        d3.select(".chart-header")
+          .text(str);
+        d3.select(this)
+          .style("opacity",1);
       })
      .on("mouseout",function(d,i){
         d3.select(this)

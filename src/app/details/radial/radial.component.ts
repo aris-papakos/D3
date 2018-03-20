@@ -15,6 +15,8 @@ export class RadialComponent implements OnInit, AfterViewInit {
   private d3: D3;
   private parentNativeElement: any;
 
+  svg: any;
+
   constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
@@ -27,16 +29,22 @@ export class RadialComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // D3
     let d3 = this.d3;
-    let radial = {}
+    let radial = {
+      width: 0,
+      height: 0
+    };
+    var parent = this.parentNativeElement.querySelector('.radial');
+
 
     // Radial
-    radial['width'] = d3.select('.radial').node().getBoundingClientRect().width;
-    radial['height'] = d3.select('.radial').node().getBoundingClientRect().height;
+
+    radial['width'] = parent.offsetWidth;
+    radial['height'] = parent.offsetHeight;
     radial['margin'] = { top: 40, right: 80, bottom: 40, left: 40 },
     radial['innerRadius'] = 20,
-    radial['chartWidth'] = radial.width - radial.margin.left - radial.margin.right,
-    radial['chartHeight'] = radial.height - radial.margin.top - radial.margin.bottom,
-    radial['outerRadius'] = (Math.min(radial.chartWidth, radial.chartHeight) / 2),
+    radial['chartWidth'] = radial.width - radial['margin'].left - radial['margin'].right,
+    radial['chartHeight'] = radial.height - radial['margin'].top - radial['margin'].bottom,
+    radial['outerRadius'] = (Math.min(radial['chartWidth'], radial['chartHeight']) / 2),
 
     this.svg = d3.select('.radial').append('svg:svg')
     .attr('width', radial.width)
@@ -50,18 +58,18 @@ export class RadialComponent implements OnInit, AfterViewInit {
     var angle = d3.scaleLinear()
         .range([0, 2 * Math.PI]);
     var radius = d3.scaleLinear()
-        .range([radial.innerRadius, radial.outerRadius]);
+        .range([radial['innerRadius'], radial['outerRadius']]);
     var x = d3.scaleBand()
         .range([0, 2 * Math.PI])
         .align(0);
     var y = d3.scaleLinear() //you can try scaleRadial but it scales differently
-        .range([radial.innerRadius, radial.outerRadius]);
+        .range([radial['innerRadius'], radial['outerRadius']]);
     var z = d3.scaleOrdinal(d3.schemeYlGnBu[9]);
 
     var expensesTotal = d3.nest()
-      .key(function(d) { return d.properties.date.raw.split("-")[1]; })
-      .key(function(d) { return d.properties.crimeType; })
-      .rollup(function(v) { return v.length; })
+      .key(function(d) { return d['properties']['date']['raw'].split("-")[1]; })
+      .key(function(d) { return d['properties']['crimeType']; })
+      .rollup(function(v:any) { return v.length; })
       .object(this.dataService.featuresRaw['home']);
 
     for (let i in expensesTotal) {
@@ -73,13 +81,13 @@ export class RadialComponent implements OnInit, AfterViewInit {
     }
 
     var numYears = d3.nest()
-      .key(function(d) { return d.properties.date.raw.split("-")[0]; })
-      .rollup(function(v) { return v.length; })
+      .key(function(d) { return d['properties']['date']['raw'].split("-")[0]; })
+      .rollup(function(v:any) { return v.length; })
     	.entries(this.dataService.featuresRaw['home'])
     	.length;
 
   	var nested_data = d3.nest()
-      .key(function(d) { return d.properties.crimeType; })
+      .key(function(d) { return d['properties']['crimeType']; })
       .entries(this.dataService.featuresRaw['home']);
 
     var crime_types = []
@@ -94,7 +102,7 @@ export class RadialComponent implements OnInit, AfterViewInit {
       expensesTotal[key].label = key;
       return expensesTotal[key];
     });
-    data.columns = crime_types;
+    data['columns'] = crime_types;
     // sort by months
     data.sort(function(a, b) {
 	    var textA = a.label;
@@ -107,7 +115,7 @@ export class RadialComponent implements OnInit, AfterViewInit {
     x.domain(data.map(function(d) { return d.label; }));
     y.domain([0, d3.max(data, function(d) { return d.total; })]);
     // z.domain(data.columns.slice(1));
-    z.domain(data.columns);
+    z.domain(data['columns']);
 
     // Extend the domain slightly to match the range of [0, 2π].
     angle.domain([0, d3.max(data, function(d,i) { return i + 1; })]);
@@ -116,7 +124,7 @@ export class RadialComponent implements OnInit, AfterViewInit {
 
     g.append("g")
       .selectAll("g")
-      .data(d3.stack().keys(data.columns)(data))
+      .data(d3.stack().keys(data['columns'])(data))
       .enter().append("g")
       .attr("fill", function(d) { return z(d.key); })
       .style("fill-opacity", 0.5)
@@ -128,10 +136,10 @@ export class RadialComponent implements OnInit, AfterViewInit {
       .attr("d", d3.arc()
       .innerRadius(function(d) { return y(d[0]); })
       .outerRadius(function(d) { return y(d[1]); })
-      .startAngle(function(d) { return x(d.data.label); })
-      .endAngle(function(d) { return x(d.data.label) + x.bandwidth(); })
+      .startAngle(function(d) { return x(d['data']['label']); })
+      .endAngle(function(d) { return x(d['data']['label']) + x.bandwidth(); })
       .padAngle(0.01)
-      .padRadius(radial.innerRadius))
+      .padRadius(radial['innerRadius']))
       .attr("transform", function(d) {return "rotate("+ angleOffset + ")"})
       .on('mouseover', function (d){
       	d3.selectAll(".rosendaleArc")
@@ -142,12 +150,12 @@ export class RadialComponent implements OnInit, AfterViewInit {
     			.transition().duration(200)
     			.style("fill-opacity", 1);
 
-    var crimeType = d3.select(this.parentNode).datum().key;
+    var crimeType = d3.select(this.parentNode).datum()['key'];
     tooltip
       .style("left", d3.event.pageX - 50 + "px")
       .style("top", d3.event.pageY - 85 + "px")
       // .style("display", "inline-block")
-      .html( crimeType + "<br>" + parseInt((d[1]-d[0])/numYears) +" on average");
+      .html( crimeType + "<br>" + ( d[1] - d[0]) / numYears +" on average");
     })
 		.on("mouseout", function(){
     	d3.selectAll(".rosendaleArc")
@@ -161,7 +169,7 @@ export class RadialComponent implements OnInit, AfterViewInit {
       .data(data)
       .enter().append("g")
       .attr("text-anchor", "middle")
-      .attr("transform", function(d) { return "rotate(" + ((x(d.label) + x.bandwidth() / 2) * 180 / Math.PI - (90-angleOffset)) + ")translate(" + (radial.outerRadius+30) + ",0)"; });
+      .attr("transform", function(d) { return "rotate(" + ((x(d.label) + x.bandwidth() / 2) * 180 / Math.PI - (90-angleOffset)) + ")translate(" + (radial['outerRadius'] + 30) + ",0)"; });
 
     label.append("text")
       .attr("transform", function(d) { return (x(d.label) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)"; })

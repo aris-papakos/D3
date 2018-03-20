@@ -16,6 +16,8 @@ export class RadarComponent implements OnInit, AfterViewInit {
   private d3: D3;
   private parentNativeElement: any;
 
+  svg: any;
+
   width:number;
   height:number;
   margin:any = {};
@@ -33,20 +35,20 @@ export class RadarComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     // D3
     let d3 = this.d3;
-    let stream = {}
+    var parent = this.parentNativeElement.querySelector('.radar');
 
     // Radar
     this.margin = { top: 100, right: 100, bottom: 100, left: 100 };
     let margin = this.margin;
-    this.width = d3.select('.radar').node().getBoundingClientRect().width - margin.left - margin.right;
-    this.height = d3.select('.radar').node().getBoundingClientRect().height - margin.top - margin.bottom;
+    this.width = parent.offsetWidth - margin.left - margin.right;
+    this.height = parent.offsetHeight - margin.top - margin.bottom;
 
     let width = Math.min(this.width, this.height);
     let height = Math.min(this.width, this.height);
 
     this.svg = d3.select('.radar').append('svg:svg')
-      .attr('width', d3.select('.radar').node().getBoundingClientRect().width)
-      .attr('height', d3.select('.radar').node().getBoundingClientRect().height)
+      .attr('width', parent.offsetWidth)
+      .attr('height', parent.offsetHeight)
 
     let rawData = this.dataService.featuresRaw['home'].map(function(d){
       return { crime: d.properties.crimeType }
@@ -57,8 +59,8 @@ export class RadarComponent implements OnInit, AfterViewInit {
 
     //data preprocessing
 		var data = d3.nest()
-			.key(function(d) { return d.properties.crimeType; })
-			.rollup(function(v) { return +d3.format(".2f")( v.length / total);})
+			.key(function(d:any) { return d['properties']['crimeType']; })
+			.rollup(function(v:any) { return +d3.format(".2f")( v.length / total);})
 			.entries(this.dataService.featuresRaw['home']);
 
 			//Average crime data of London (Dummy Data)
@@ -109,7 +111,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
 		//Call function to draw the Radar chart
 		this.radarChart(".radar", dataArray);
 
-    var colorscale = d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])
+    let colorscale:any = d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])
 
     //Legend titles
     var LegendOptions = ['Area of Interest', 'London Average'];
@@ -162,11 +164,18 @@ export class RadarComponent implements OnInit, AfterViewInit {
   	 strokeWidth: 2, 		//The width of the stroke around each blob
   	 roundStrokes: true,	//If true the area and stroke will follow a round path (cardinal-closed)
   	 //color: d3.scaleOrdinal(d3.schemeCategory20c).domain(d3.range(0, 10))	//Color function
-     color: d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])	//Color function
   	};
 
+    let color:any = d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])	//Color function
+
+
   	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
-  	var maxValue = Math.ceil((Math.max(cfg.maxValue, d3.max(data, function(i){return d3.max(i.map(function(o){return o.value;}))})) * 10)) / 10;
+  	var maxValue = Math.ceil(
+      (Math.max(cfg['maxValue'], d3.max(data, function(i:any) {
+        return d3.max(i.map(function(o){
+          return o.value;
+        }));
+      })) * 10)) / 10;
 
     //Show level in Interval of 0.1
     cfg.levels = Math.ceil(maxValue*10);
@@ -262,7 +271,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
   		.attr("dy", "0.35em")
   		.attr("x", function(d, i){ return rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
   		.attr("y", function(d, i){ return rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice*i - Math.PI/2); })
-  		.text(function(d){return d})
+  		.text(function(d:any){return d})
   		.call(wrap, cfg.wrapWidth);
 
 
@@ -272,7 +281,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
   //The radial line function
   var radarLine = d3.radialLine()
     .curve(d3.curveLinearClosed)
-    .radius(function(d) { return rScale(d.value); })
+    .radius(function(d:any) { return rScale(d['value']); })
     .angle(function(d,i) {	return i*angleSlice; });
 
   if(cfg.roundStrokes) {
@@ -280,7 +289,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
   }
 
   //variable needed for coloring circles
-  var j = -1;
+  let j:number = -1;
 
   //Create a wrapper for the blobs
   var blobWrapper = g.selectAll(".radarWrapper")
@@ -292,8 +301,8 @@ export class RadarComponent implements OnInit, AfterViewInit {
   blobWrapper
     .append("path")
     .attr("class", "radarArea")
-    .attr("d", function(d,i) { return radarLine(d); })
-    .style("fill", function(d,i) { return cfg.color(i); })
+    .attr("d", function(d:any, i) { return radarLine(d); })
+    .style("fill", function(d, i:number) { return color(i); })
     .style("fill-opacity", cfg.opacityArea)
     .on('mouseover', function (d,i){
       //Dim all blobs
@@ -315,22 +324,27 @@ export class RadarComponent implements OnInit, AfterViewInit {
   //Create the outlines
   blobWrapper.append("path")
     .attr("class", "radarStroke")
-    .attr("d", function(d,i) { return radarLine(d); })
+    .attr("d", function(d:any, i) { return radarLine(d); })
     .style("stroke-width", cfg.strokeWidth + "px")
-    .style("stroke", function(d,i) { return cfg.color(i); })
+    .style("stroke", function(d,i) { return color(i); })
     .style("fill", "none")
     .style("filter" , "url(#glow)");
 
   //Append the circles
   blobWrapper.selectAll(".radarCircle")
-    .data(function(d,i) { return d; })
+    .data(function(d:any,i) { return d; })
     .enter().append("circle")
     .attr("class", "radarCircle")
     .attr("r", cfg.dotRadius)
-    .attr("cx", function(d,i){return rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2); })
-    .attr("cy", function(d,i){return rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2); })
+    .attr("cx", function(d,i){return rScale(d['value']) * Math.cos(angleSlice*i - Math.PI/2); })
+    .attr("cy", function(d,i){return rScale(d['value']) * Math.sin(angleSlice*i - Math.PI/2); })
     //coloring circles - color hack
-    .style("fill", function(d,i) { if (i == 0) { j++ }; return cfg.color(j); })
+    .style("fill", function(d:string, i:any) {
+      if (i == 0) {
+        j++
+      };
+      return color(j);
+    })
     .style("fill-opacity", 0.8);
 
   //Wrapper for the invisible circles on top
@@ -341,12 +355,12 @@ export class RadarComponent implements OnInit, AfterViewInit {
 
   //Append a set of invisible circles on top for the mouseover pop-up
   blobCircleWrapper.selectAll(".radarInvisibleCircle")
-    .data(function(d,i) { return d; })
+    .data(function(d:any, i) { return d; })
     .enter().append("circle")
     .attr("class", "radarInvisibleCircle")
     .attr("r", cfg.dotRadius*1.5)
-    .attr("cx", function(d,i){ return rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2); })
-    .attr("cy", function(d,i){ return rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2); })
+    .attr("cx", function(d,i){ return rScale(d['value']) * Math.cos(angleSlice*i - Math.PI/2); })
+    .attr("cy", function(d,i){ return rScale(d['value']) * Math.sin(angleSlice*i - Math.PI/2); })
     .style("fill", "none")
     .style("pointer-events", "all")
     .on("mouseover", function(d,i) {
@@ -356,7 +370,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
       tooltip
         .attr('x', newX)
         .attr('y', newY)
-        .text(Format(d.value))
+        .text(Format(d['value']))
         .transition().duration(200)
         .style('opacity', 1);
     })
@@ -384,17 +398,18 @@ export class RadarComponent implements OnInit, AfterViewInit {
         lineHeight = 1.4, // ems
         y = text.attr("y"),
         x = text.attr("x"),
-        dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+        dy = parseFloat(text.attr("dy"));
+
+      let tspan:any = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
 
       while (word = words.pop()) {
         line.push(word);
         tspan.text(line.join(" "));
         if (tspan.node().getComputedTextLength() > width) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
         }
       }
       });
