@@ -12,7 +12,7 @@ var LocationsSchema				= mongoose.Schema({
 	},
 	properties						: {
 		description						:	String,
-		crimes								: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Crime' } ]
+		crimes								: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Report' } ]
 	}
 });
 

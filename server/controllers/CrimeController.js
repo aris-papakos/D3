@@ -1,5 +1,6 @@
 // app/controllers/WardsController.js
 const Crime               = require('../models/crime');
+const Location            = require('../models/location');
 const Ward                = require('../models/ward');
 
 const async               = require('async');
@@ -21,19 +22,18 @@ module.exports = (function() {
         var date = new Date()
         date = date.setDate(date.getDate() - 90);
 
-        Crime.find({
-          $and :[
-            { 'geometry': { $geoWithin: { $geometry: ward.geometry } } },
-            // { 'properties.date.dateString': { '$gte': date } }
-          ]
+        Location.find({
+           'geometry': { $geoWithin: { $geometry: ward.geometry } }
         })
-
-        .exec(function(err, crimes) {
+        .populate({
+          path: 'properties.crimes',
+        })
+        .exec(function(err, location) {
           if (err) console.error(err);
 
-          console.log(crimes.length);
+          console.log(location.length);
 
-          res.status(200).json(crimes)
+          res.status(200).json(location)
         });
       });
     },

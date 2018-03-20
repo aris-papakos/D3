@@ -1,5 +1,8 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit }           from '@angular/core';
+  OnInit, AfterViewInit, Input,
+  OnChanges, SimpleChanges }        from '@angular/core';
+import { ActivatedRoute }           from '@angular/router';
+
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
@@ -9,24 +12,40 @@ import { DataService }              from '../../services/data.service';
   templateUrl: './radial.component.html',
   styleUrls: ['./radial.component.css']
 })
-export class RadialComponent implements OnInit, AfterViewInit {
+export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
+
+  @Input() graphInput: any;
 
   // D3
   private d3: D3;
   private parentNativeElement: any;
 
+  area: string;
   svg: any;
 
-  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service) {
+  graphData = [];
+
+  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service , private route: ActivatedRoute) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
   }
 
   ngOnInit() {
-
+    this.route.params.subscribe(params => {
+      this.area = params.area;
+    });
   }
 
-  ngAfterViewInit() {
+  ngOnChanges(changes: SimpleChanges) {
+    const graphInput: SimpleChange = changes.graphInput;
+
+    this.d3.select('.radial').select('svg').remove();
+
+    this.renderGraph(graphInput.currentValue)
+  }
+
+
+  renderGraph(graphData: any) {
     // D3
     let d3 = this.d3;
     let radial = {
@@ -34,7 +53,6 @@ export class RadialComponent implements OnInit, AfterViewInit {
       height: 0
     };
     var parent = this.parentNativeElement.querySelector('.radial');
-
 
     // Radial
 
@@ -67,10 +85,10 @@ export class RadialComponent implements OnInit, AfterViewInit {
     var z = d3.scaleOrdinal(d3.schemeYlGnBu[9]);
 
     var expensesTotal = d3.nest()
-      .key(function(d) { return d['properties']['date']['raw'].split("-")[1]; })
-      .key(function(d) { return d['properties']['crimeType']; })
+      .key(function(d) { return d['date']['raw'].split("-")[1]; })
+      .key(function(d) { return d['crimeType']; })
       .rollup(function(v:any) { return v.length; })
-      .object(this.dataService.featuresRaw['home']);
+      .object(graphData);
 
     for (let i in expensesTotal) {
       var t = 0;
@@ -81,14 +99,14 @@ export class RadialComponent implements OnInit, AfterViewInit {
     }
 
     var numYears = d3.nest()
-      .key(function(d) { return d['properties']['date']['raw'].split("-")[0]; })
+      .key(function(d) { return d['date']['raw'].split("-")[0]; })
       .rollup(function(v:any) { return v.length; })
-    	.entries(this.dataService.featuresRaw['home'])
+    	.entries(graphData)
     	.length;
 
   	var nested_data = d3.nest()
-      .key(function(d) { return d['properties']['crimeType']; })
-      .entries(this.dataService.featuresRaw['home']);
+      .key(function(d) { return d['crimeType']; })
+      .entries(graphData);
 
     var crime_types = []
     nested_data.forEach(function(key) {

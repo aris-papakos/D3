@@ -80,7 +80,7 @@ export class DashboardComponent implements OnInit {
           this.wardHome = home
           this.dataService.getCrime(home)
             .subscribe(data => {
-              this.featureCollection['home'] = data;
+              this.featureCollection[home] = data;
               this.dataService.setFeatures(this.featureCollection);
             });
 

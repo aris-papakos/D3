@@ -1,5 +1,7 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit }           from '@angular/core';
+  OnInit, AfterViewInit, Input,
+  OnChanges, SimpleChanges }        from '@angular/core';
+import { ActivatedRoute }           from '@angular/router'
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
@@ -12,17 +14,22 @@ import { DataService }              from '../../services/data.service';
 })
 export class RadarComponent implements OnInit, AfterViewInit {
 
+  @Input() graphInput: any;
+
   // D3
   private d3: D3;
   private parentNativeElement: any;
-
-  svg: any;
 
   width:number;
   height:number;
   margin:any = {};
 
-  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service) {
+  area: string;
+  svg: any;
+
+  graphData = [];
+
+  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service , private route: ActivatedRoute) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
 
@@ -30,9 +37,20 @@ export class RadarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.area = params.area;
+    });
   }
 
-  ngAfterViewInit() {
+  ngOnChanges(changes: SimpleChanges) {
+    const graphInput: SimpleChange = changes.graphInput;
+
+    this.d3.select('.radar').select('svg').remove();
+
+    this.renderGraph(graphInput.currentValue);
+  }
+
+  renderGraph(graphData: any) {
     // D3
     let d3 = this.d3;
     var parent = this.parentNativeElement.querySelector('.radar');
@@ -50,8 +68,8 @@ export class RadarComponent implements OnInit, AfterViewInit {
       .attr('width', parent.offsetWidth)
       .attr('height', parent.offsetHeight)
 
-    let rawData = this.dataService.featuresRaw['home'].map(function(d){
-      return { crime: d.properties.crimeType }
+    let rawData = graphData.map(function(d){
+      return { crime: d['crimeType'] }
     });
 
     //Calculate total number of crimes (needed for calculating fraction)
@@ -59,9 +77,9 @@ export class RadarComponent implements OnInit, AfterViewInit {
 
     //data preprocessing
 		var data = d3.nest()
-			.key(function(d:any) { return d['properties']['crimeType']; })
+			.key(function(d:any) { return d['crimeType']; })
 			.rollup(function(v:any) { return +d3.format(".2f")( v.length / total);})
-			.entries(this.dataService.featuresRaw['home']);
+			.entries(graphData);
 
 			//Average crime data of London (Dummy Data)
 		var londonAVG = [//London Average

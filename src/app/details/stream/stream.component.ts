@@ -1,5 +1,7 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit }           from '@angular/core';
+  OnInit, AfterViewInit, Input,
+  OnChanges, SimpleChanges }        from '@angular/core';
+import { ActivatedRoute }           from '@angular/router';
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
@@ -11,22 +13,42 @@ import { DataService }              from '../../services/data.service';
 })
 export class StreamComponent implements OnInit, AfterViewInit {
 
+  @Input() graphInput: any;
+
   // D3
   private d3: D3;
   private parentNativeElement: any;
 
-  svg:any;
+  area: string;
+  svg: any;
 
-  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service) {
+  graphData = [];
+
+  constructor(private dataService: DataService, element: ElementRef, d3Service: D3Service , private route: ActivatedRoute) {
     this.d3 = d3Service.getD3();
     this.parentNativeElement = element.nativeElement;
   }
 
   ngOnInit() {
-
+    this.route.params.subscribe(params => {
+      this.area = params.area;
+    });
   }
 
-  ngAfterViewInit() {
+  ngOnChanges(changes: SimpleChanges) {
+    const graphInput: SimpleChange = changes.graphInput;
+
+    this.d3.select('.stream').select('svg').remove();
+    let sortedGraphData = graphInput.currentValue.sort(function(a, b) {
+      a = new Date(a['date']['dateString']);
+      b = new Date(b['date']['dateString')];
+      return a>b ? -1 : a<b ? 1 : 0;
+    });
+
+    this.renderGraph(sortedGraphData);
+  }
+
+  renderGraph(graphData: any) {
     // D3
     let d3 = this.d3;
 
@@ -38,7 +60,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
     .attr('width', parent.offsetWidth)
     .attr('height', parent.offsetHeight)
 
-    let margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    let margin = { top: 60, right: 60, bottom: 60, left: 60 };
     let width = parent.offsetWidth - margin.right- margin.left;
     let height = parent.offsetHeight - margin.top - margin.bottom;
 
@@ -67,8 +89,8 @@ export class StreamComponent implements OnInit, AfterViewInit {
 /////////////////////////////////////////////////////////////////////////////
 
     var nested_data = d3.nest()
-      .key(function(d) { return d['properties']['crimeType']; })
-      .entries(this.dataService.featuresRaw['home']);
+      .key(function(d) { return d['crimeType']; })
+      .entries(graphData);
 
     //crime categories
     var crime_types = []
@@ -77,10 +99,10 @@ export class StreamComponent implements OnInit, AfterViewInit {
     });
 
     var expensesTotal = d3.nest()
-      .key(function(d) { return d['properties']['date']['raw']; })
-      .key(function(d) { return d['properties']['crimeType']; })
+      .key(function(d) { return d['date']['raw']; })
+      .key(function(d) { return d['crimeType']; })
       .rollup(function(v:any) { return v.length })
-      .object(this.dataService.featuresRaw['home']);
+      .object(graphData);
 
     // put label inside as key and return an array
     var data = Object.keys(expensesTotal).map(function(key) {
