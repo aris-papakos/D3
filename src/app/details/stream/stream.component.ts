@@ -41,7 +41,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
     this.d3.select('.stream').select('svg').remove();
     let sortedGraphData = graphInput.currentValue.sort(function(a, b) {
       a = new Date(a['date']['dateString']);
-      b = new Date(b['date']['dateString')];
+      b = new Date(b['date']['dateString']);
       return a>b ? -1 : a<b ? 1 : 0;
     });
 

@@ -56,7 +56,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
     var parent = this.parentNativeElement.querySelector('.radar');
 
     // Radar
-    this.margin = { top: 100, right: 100, bottom: 100, left: 100 };
+    this.margin = { top: 80, right: 80, bottom: 80, left: 80 };
     let margin = this.margin;
     this.width = parent.offsetWidth - margin.left - margin.right;
     this.height = parent.offsetHeight - margin.top - margin.bottom;
@@ -116,7 +116,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
 				if (londonAVG[i].key === data[j].key) {
 					londonArray.push(londonAVG[i]);
 				}
-			};
+			 };
     };
 		//Add crime data of area of interest and London to dataArray
 		var dataArray = [];
@@ -136,19 +136,22 @@ export class RadarComponent implements OnInit, AfterViewInit {
     var svg = d3.select('.radar')
     	.selectAll('svg')
     	.append('svg')
-    	.attr("width", width + margin.left + margin.right)
-    	.attr("height", height)
+    	.attr("width", width*5)
+    	.attr("height", height*5)
     //Initiate Legend
     var legend = svg.append("g")
     	.attr("class", "legend")
-    	.attr('transform', 'translate(90,20)');
+    	//.attr('transform', 'translate(90,20)');
+      .attr('transform', 'translate(270,270)');
   	//Create colour squares
   	legend.selectAll('rect')
   	  .data(LegendOptions)
   	  .enter()
   	  .append("rect")
-  	  .attr("x", width)
-  	  .attr("y", function(d, i){ return i * 20;})
+  	  //.attr("x", width)
+      .attr("x", width)
+  	  //.attr("y", function(d, i){ return i * 20;})
+      .attr("y", function(d, i){ return i * 20;})
   	  .attr("width", 10)
   	  .attr("height", 10)
   	  .style("fill", function(d, i){ return colorscale(i);});
@@ -174,17 +177,18 @@ export class RadarComponent implements OnInit, AfterViewInit {
   	 margin: this.margin, //The margins of the SVG
   	 levels: 0,				//How many levels or inner circles should there be drawn
   	 maxValue: 0,			//What is the value that the biggest circle will represent
-  	 labelFactor: 1.30, 	//How much farther than the radius of the outer circle should the labels be placed
-  	 wrapWidth: 70, 		//The number of pixels after which a label needs to be given a new line
-  	 opacityArea: 0.35, 	//The opacity of the area of the blob
-  	 dotRadius: 5, 			//The size of the colored circles of each blob
-  	 opacityCircles: 0.2, 	//The opacity of the circles of each blob
+  	 labelFactor: 1.50, 	//How much farther than the radius of the outer circle should the labels be placed
+  	 wrapWidth: 90, 		//The number of pixels after which a label needs to be given a new line
+  	 opacityArea: 0.4, 	//The opacity of the area of the blob
+  	 dotRadius: 4, 			//The size of the colored circles of each blob
+  	 opacityCircles: 0.3, 	//The opacity of the circles of each blob
   	 strokeWidth: 2, 		//The width of the stroke around each blob
   	 roundStrokes: true,	//If true the area and stroke will follow a round path (cardinal-closed)
   	 //color: d3.scaleOrdinal(d3.schemeCategory20c).domain(d3.range(0, 10))	//Color function
   	};
 
     let color:any = d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])	//Color function
+
 
 
   	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
@@ -283,10 +287,10 @@ export class RadarComponent implements OnInit, AfterViewInit {
   	//Append the labels at each axis
   	axis.append("text")
   		.attr("class", "legend")
-  		.style("font-size", "12px")
+  		.style("font-size", "10px")
       .style("font-weight", "bold")
   		.attr("text-anchor", "middle")
-  		.attr("dy", "0.35em")
+  		.attr("dy", "0.25em")
   		.attr("x", function(d, i){ return rScale(maxValue * cfg.labelFactor) * Math.cos(angleSlice*i - Math.PI/2); })
   		.attr("y", function(d, i){ return rScale(maxValue * cfg.labelFactor) * Math.sin(angleSlice*i - Math.PI/2); })
   		.text(function(d:any){return d})
@@ -363,7 +367,7 @@ export class RadarComponent implements OnInit, AfterViewInit {
       };
       return color(j);
     })
-    .style("fill-opacity", 0.8);
+    .style("fill-opacity", 0.99);
 
   //Wrapper for the invisible circles on top
   var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
