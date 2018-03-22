@@ -98,6 +98,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
     nested_data.forEach(function(key) {
       crime_types.push(key.key)
     });
+    crime_types.sort();
 
     var expensesTotal = d3.nest()
       .key(function(d) { return d['date']['raw']; })
