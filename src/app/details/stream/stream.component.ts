@@ -6,6 +6,7 @@ import { ActivatedRoute }           from '@angular/router';
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
 
+//this is component
 @Component({
   selector: 'app-stream',
   templateUrl: './stream.component.html',
@@ -70,7 +71,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
 
     var z= d3.scaleOrdinal(d3.schemeYlGnBu[9]);
     var x = d3.scaleTime().range([0,width-5]);
-    var y = d3.scaleLinear().range([height-20,0]);
+    var y = d3.scaleLinear().range([height/1.2,0]);
 
     var xAxis = d3.axisBottom(x)
       .scale(x)
@@ -190,7 +191,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
         .classed("x axis-label", true)
         .style("text-anchor", "middle")
         .attr("transform", "translate(" + width/1.9 + "," + 48 + ")")
-        .text("Months");
+        .text("Monthly Streaming Crimes of London");
       this.select(".axis.y")
         .append("text")
         .style("fill","black")
@@ -223,7 +224,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
       .on("mousemove", function(d,i){
         let mousex = d3.mouse(this)[0];
         var invertedx = x.invert(mousex);
-        var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month;
+        var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month+1;
         var amount_of_crimes =d[amount].data[d.key];
         let invertedDate = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
         var selected = (d.values);
