@@ -16,7 +16,7 @@
 
       <form [formGroup]="formGroup" novalidate>
 
-        <div class="segment-small" fxLayout="column" >
+        <!-- <div class="segment-small" fxLayout="column" >
 
           <div class="card-header" fxLayout="row">
             <span>Mode of transportation</span>
@@ -31,7 +31,7 @@
             </mat-select>
           </mat-form-field>
 
-        </div>
+        </div> -->
 
 
         <div formArrayName="locations">
@@ -40,12 +40,12 @@
             <div class="area" fxLayout="column">
 
               <div class="card-header" fxLayout="row">
-                <span>Area Settings</span>
+                <span>Area</span>
                 <span fxFlex></span>
               </div>
 
               <div [formGroupName]="i">
-                <mat-form-field class="full-width">
+                <!-- <mat-form-field class="full-width">
                   <input matInput formControlName="label" placeholder="Label">
                 </mat-form-field>
 
@@ -55,7 +55,7 @@
                       {{ type.label }}
                     </mat-option>
                   </mat-select>
-                </mat-form-field>
+                </mat-form-field> -->
 
                 <mat-form-field class="text-form">
                   <input type="text" aria-label="Home" matInput
@@ -74,29 +74,31 @@
 
             <div class="connections" fxFlex fxLayout="column">
 
-              <div class="card-header" fxLayout="row">
-                Info
-              </div>
+              <!-- <div class="card-header" fxLayout="row">
+                Status
+              </div> -->
 
-              <div fxFlex fxLayoutAlign="center center" *ngIf="showSpinner(i)">
-                <mat-spinner class="spinner" [diameter]="20"></mat-spinner>
-              </div>
+
 
               <div class="info-container" fxFlex fxLayout="column">
 
               </div>
 
-              <div class="actions" fxLayout="row" fxLayoutAlign="end center">
+              <div fxFlex class="actions" fxLayout="row" fxLayoutAlign="end center">
+                <div fxFlex fxLayoutAlign="center center" *ngIf="showSpinner(i)">
+                  <mat-spinner class="spinner" [diameter]="20"></mat-spinner>
+                </div>
+
                 <button
                   mat-button mat-mini-fab color="primary" matTooltip="Show area details"
                   (click)="showDetails(i)">
                   <i class="material-icons">remove_red_eye</i>
                 </button>
-                <button
+                <!-- <button
                   mat-button mat-mini-fab color="primary" matTooltip="Remove this area"
                   (click)="removeLocation(i)">
                   <i class="material-icons">delete</i>
-                </button>
+                </button> -->
               </div>
 
             </div>
@@ -105,6 +107,14 @@
           </div>
         </div>
       </form>
+
+    </div>
+
+    <div class="legend" fxLayout="row wrap">
+
+      <div fxFlex="50" fxLayout="row wrap" *ngFor="let color of colorsArray">
+        <div class="legend-color" [style.background-color]="color.color"> </div> {{ color.label }}
+      </div>
 
     </div>
 

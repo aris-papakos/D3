@@ -62,31 +62,33 @@ export class LeafletComponent implements OnInit {
       let combinedLayer = L.geoJSON();
       let colors = this.colors;
 
-      for (let x in features) {
-        let layer = L.geoJSON(features[x], {
-          onEachFeature: function(feature) {
-            let point = turf.point(feature.geometry.coordinates);
-            let buffered = turf.buffer(point, 0.15);
+      for (let i in features) {
+        for (let x in features[i]) {
+          let layer = L.geoJSON(features[i][x], {
+            onEachFeature: function(feature) {
+              let point = turf.point(feature.geometry.coordinates);
+              let buffered = turf.buffer(point, 0.15);
 
-            feature.properties.crimes.forEach(function(crime) {
-              let random = randomPoint(1, buffered);
-              let position = L.latLng(random[0].geometry.coordinates[1], random[0].geometry.coordinates[0])
+              feature.properties.crimes.forEach(function(crime) {
+                let random = randomPoint(1, buffered);
+                let position = L.latLng(random[0].geometry.coordinates[1], random[0].geometry.coordinates[0])
 
-              let marker =  L.circleMarker(position, {
-                  radius: 3,
-                  fillColor: colors[crime.crimeType],
-                  color: colors[crime.crimeType],
-                  weight: 0,
-                  opacity: 1,
-                  fillOpacity: 0.8
-                });
+                let marker =  L.circleMarker(position, {
+                    radius: 3,
+                    fillColor: colors[crime.crimeType],
+                    color: colors[crime.crimeType],
+                    weight: 0,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                  });
 
-              marker.addTo(combinedLayer);
-            })
-          }
-        });
+                marker.addTo(combinedLayer);
+              })
+            }
+          });
 
-        layer.addTo(combinedLayer);
+          layer.addTo(combinedLayer);
+        };
       }
 
       this.crimeLayer.clearLayers();

@@ -8,6 +8,7 @@
 
 .system {
   padding: 10px;
+  overflow-y: scroll;
 }
 
 .segment-small {
@@ -20,7 +21,7 @@
 }
 
 .segment {
-  height: 250px;
+  height: 120px;
   width: 100%;
   margin-bottom: 20px;
   background-color: #fff;
@@ -65,4 +66,19 @@
 
 .text-form {
   width: 220px;
+}
+
+.legend {
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #571FB5;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+
+  margin-right: 10px;
+
+  border-radius: 50%;
 }

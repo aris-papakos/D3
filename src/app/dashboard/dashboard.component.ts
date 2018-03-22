@@ -27,19 +27,40 @@ export class DashboardComponent implements OnInit {
 
   formGroup                         : FormGroup;
 
-  featureCollection                 = [];
+  featureCollection                 = {
+    areas: [],
+    routes: []
+  };
   crimeList                         = {
     asbo                              : 0,
     shoplifting                       : 0,
     robbery                           : 0,
   }
 
+  transportation = null;
   segments                          = [];
   filters                           = [];
   locationTypes                     = [
     { 'label': 'Home', 'value': 'home' },
     { 'label': 'Work', 'value': 'work' },
     { 'label': 'Leisure', 'value': 'leisure' }
+  ]
+
+  colorsArray = [
+    { label: "Anti-social behaviour", color: "#ffffd9" },
+    { label: "Bicycle theft", color: "#edf8b1" },
+    { label: "Burglary", color: "#c7e9b4" },
+    { label: "Criminal damage and arson", color: "#7fcdbb" },
+    { label: "Drugs", color: "#41b6c4" },
+    { label: "Other crime", color: "#1d91c0" },
+    { label: "Other theft", color: "#225ea8" },
+    { label: "Possession of weapons", color: "#253494" },
+    { label: "Public order", color: "#081d58" },
+    { label: "Robbery", color: "#ffffd9" },
+    { label: "Shoplifting", color: "#edf8b1" },
+    { label: "Theft from the person", color: "#c7e9b4" },
+    { label: "Vehicle crime", color: "#7fcdbb" },
+    { label: "Violence and sexual offences", color: "#41b6c4" }
   ]
 
 
@@ -58,6 +79,12 @@ export class DashboardComponent implements OnInit {
       locations: this.fb.array([
           this.initLocation(0),
       ])
+    });
+
+    this.formGroup.get('transportation').valueChanges
+    .debounceTime(500)
+    .subscribe(value => {
+      this.transportation = value;
     });
   }
 
@@ -92,9 +119,41 @@ export class DashboardComponent implements OnInit {
         this.dataService.getCrime(value)
           .subscribe(data => {
             this.segments[i].loading = false;
-            this.featureCollection[i] = data;
+            this.featureCollection.areas[i] = data;
             this.dataService.setFeatures(this.featureCollection);
           });
+
+        // var _pairs = [];
+        // for (let o = 0; o < this.segments.length; o++){
+        //   let selectedNow = this.segments[o].ward;
+        //
+        //   for (let j = 0; j < this.segments.length;j++){
+        //
+        //     if (selectedNow == this.segments[j].ward) {/*ignore*/ }
+        //
+        //     else {
+        //       let combination = [selectedNow, this.segments[j].ward];
+        //
+        //       if (_pairs.indexOf(combination) == -1 && _pairs.indexOf([combination[1], combination[0]]) == -1) {
+        //         _pairs.push(combination);
+        //       }
+        //     }
+        //   }
+        // }
+
+        // console.log(_pairs)
+
+        // if (this.transportation != null && _pairs.length > 0) {
+        //
+        //   for (let n = 0; n < _pairs.length; n++ ) {
+        //     this.dataService.getRoute(this.transportation, _pairs[n][0], _pairs[n][1])
+        //     .subscribe(data => {
+        //       this.featureCollection.routes = []
+        //       this.featureCollection.routes.push(data);
+        //       // this.dataService.setFeatures(this.featureCollection);
+        //     });
+        //   }
+        // }
       }
     });
 
@@ -115,6 +174,8 @@ export class DashboardComponent implements OnInit {
   removeLocation(i: number) {
     let control = <FormArray>this.formGroup.controls['locations'];
     control.removeAt(i);
+    this.featureCollection.area.removeAt(i)
+    this.dataService.setFeatures(this.featureCollection);
   }
 
   showDetails(i: number) {

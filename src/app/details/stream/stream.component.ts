@@ -1,17 +1,18 @@
 import { Component, ElementRef,
-  OnInit, Input, OnChanges,
-  SimpleChange, SimpleChanges }     from '@angular/core';
+  OnInit, AfterViewInit, Input,
+  OnChanges, SimpleChanges }        from '@angular/core';
 import { ActivatedRoute }           from '@angular/router';
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
 
+//this is component
 @Component({
   selector: 'app-stream',
   templateUrl: './stream.component.html',
   styleUrls: ['./stream.component.css']
 })
-export class StreamComponent implements OnInit, OnChanges {
+export class StreamComponent implements OnInit, AfterViewInit {
 
   @Input() graphInput: any;
 
@@ -41,7 +42,7 @@ export class StreamComponent implements OnInit, OnChanges {
     this.d3.select('.stream').select('svg').remove();
     let sortedGraphData = graphInput.currentValue.sort(function(a, b) {
       a = new Date(a['date']['dateString']);
-      b = new Date(b['date']['dateString']);
+      b = new Date(b['date']['dateString')];
       return a>b ? -1 : a<b ? 1 : 0;
     });
 
@@ -70,7 +71,7 @@ export class StreamComponent implements OnInit, OnChanges {
 
     var z= d3.scaleOrdinal(d3.schemeYlGnBu[9]);
     var x = d3.scaleTime().range([0,width-5]);
-    var y = d3.scaleLinear().range([height-20,0]);
+    var y = d3.scaleLinear().range([height/1.2,0]);
 
     var xAxis = d3.axisBottom(x)
       .scale(x)
@@ -97,6 +98,7 @@ export class StreamComponent implements OnInit, OnChanges {
     nested_data.forEach(function(key) {
       crime_types.push(key.key)
     });
+    crime_types.sort();
 
     var expensesTotal = d3.nest()
       .key(function(d) { return d['date']['raw']; })
@@ -174,15 +176,15 @@ export class StreamComponent implements OnInit, OnChanges {
         .attr('transform', 'translate(0,'+height+')')
         .call(params.axis.x);
       // create y axis left
-      this.append("g")
-        .classed("axis y", true)
-        .attr('transform', 'translate('+-5+','+20+')')
-        .call(params.axis.y);
-      // create y axis right
-      this.append("g")
-        .classed("y axis2", true)
-        .attr('transform', 'translate('+width+','+20+')')
-        .call(params.axis.y2);
+      // this.append("g")
+      //   .classed("axis y", true)
+      //   .attr('transform', 'translate('+-5+','+20+')')
+      //   .call(params.axis.y);
+      // // create y axis right
+      // this.append("g")
+      //   .classed("y axis2", true)
+      //   .attr('transform', 'translate('+width+','+20+')')
+      //   .call(params.axis.y2);
      //label of x axis
       this.select(".axis.x")
         .append("text")
@@ -190,7 +192,7 @@ export class StreamComponent implements OnInit, OnChanges {
         .classed("x axis-label", true)
         .style("text-anchor", "middle")
         .attr("transform", "translate(" + width/1.9 + "," + 48 + ")")
-        .text("Months");
+        // .text("Monthly Streaming Crimes of London");
       this.select(".axis.y")
         .append("text")
         .style("fill","black")
@@ -223,7 +225,7 @@ export class StreamComponent implements OnInit, OnChanges {
       .on("mousemove", function(d,i){
         let mousex = d3.mouse(this)[0];
         var invertedx = x.invert(mousex);
-        var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month;
+        var amount = invertedx.getMonth()+(invertedx.getFullYear()-min_year)*10-min_month+1;
         var amount_of_crimes =d[amount].data[d.key];
         let invertedDate = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
         var selected = (d.values);

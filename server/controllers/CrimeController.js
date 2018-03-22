@@ -105,17 +105,12 @@ module.exports = (function() {
               var date = new Date()
               date = date.setDate(date.getDate() - 90);
 
-              Crime.find({
-                $and :[
-                  { 'geometry': { $geoWithin: { $geometry: buffered.geometry } } },
-                  { 'properties.date.dateString': { '$gte': date } }
-                ]
-              })
+              Location.find({ 'geometry': { $geoWithin: { $geometry: buffered.geometry } } })
 
-              .exec(function(err, crimes) {
+              .exec(function(err, location) {
                 if (err) console.error(err);
 
-                res.status(200).json(crimes)
+                res.status(200).json(location)
               });
             });
           } else {

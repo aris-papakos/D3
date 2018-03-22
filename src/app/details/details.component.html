@@ -1,5 +1,13 @@
 <div class="container" fxLayout="column">
 
+  <div class="legend" fxLayout="row wrap">
+
+    <div fxFlex="33" fxLayout="row wrap" *ngFor="let color of colorsArray">
+      <div class="legend-color" [style.background-color]="color.color"> </div> {{ color.label }}
+    </div>
+
+  </div>
+
   <div fxFlex fxLayout="row">
 
     <div fxFlex>
@@ -12,25 +20,31 @@
       </div>
 
     </div>
-    <div fxFlex>
+    <div fxFlex fxLayout="column">
 
-      <app-radial [graphInput]="crimeCollection"></app-radial>
-
+      <span class="graph-header">Seasonal patterns by crime type and month</span>
+      <div fxFlex>
+        <app-radial [graphInput]="crimeCollection"></app-radial>
+      </div>
     </div>
 
   </div>
 
   <div fxFlex fxLayout="row">
 
-    <div fxFlex>
+    <div fxFlex fxLayout="column">
 
-      <app-stream [graphInput]="crimeCollection"></app-stream>
+      <span class="graph-header">Monthly crimes over time</span>
+      <div fxFlex>
+        <app-stream [graphInput]="crimeCollection"></app-stream>
+      </div>
 
     </div>
-    <div fxFlex>
-
-      <app-radar [graphInput]="crimeCollection"></app-radar>
-
+    <div fxFlex fxLayout="column">
+      <span class="graph-header">Comparison with London Average</span>
+      <div fxFlex>
+        <app-radar [graphInput]="crimeCollection"></app-radar>
+      </div>
     </div>
 
   </div>
