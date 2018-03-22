@@ -72,7 +72,7 @@ export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
     let g = this.svg.append("g").attr("transform", "translate(" + radial.width / 2 + "," + radial.height / 2 + ")");
 
 
-    var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+    var tooltip = d3.select(".radial").append("div").attr("class", "toolTip");
     var angle = d3.scaleLinear()
         .range([0, 2 * Math.PI]);
     var radius = d3.scaleLinear()
@@ -170,9 +170,19 @@ export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
 
     var crimeType = d3.select(this.parentNode).datum()['key'];
     tooltip
+      .style("position","absolute")
+      .style("background",'none repeat scroll 0 0 #DCDCDC')
+      .style("border","1px solid #6F257F")
+      .style("border-radius","15px")
+      .style("padding",'14px')
+      .style("text-align", 'center')
+      .style("min-width", '80px')
+      .style("height", "auto")
       .style("left", d3.event.pageX - 50 + "px")
       .style("top", d3.event.pageY - 85 + "px")
-      // .style("display", "inline-block")
+      .style("z-index", 1)
+      .style("display", "inline-block")
+      .style("min-width","80px")
       .html( crimeType + "<br>" + ( d[1] - d[0]) / numYears +" on average");
     })
 		.on("mouseout", function(){
@@ -195,4 +205,4 @@ export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
       .style("font-size",14);
   }
 
-}
+} 
