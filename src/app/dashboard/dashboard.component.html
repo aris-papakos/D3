@@ -1,0 +1,90 @@
+<div class="container" fxLayout="row">
+  <div class="pane padding" fxLayout="column" fxFlex>
+
+    <form fxFlex fxLayout="column">
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I live in the </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Home" matInput
+            [formControl]="selectHome"
+            [matAutocomplete]="home">
+          <mat-autocomplete #home="matAutocomplete">
+            <mat-option *ngFor="let option of filteredHome | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <span class="text-line">ward.</span>
+        <a [routerLink]="['/details', wardHome]">
+          <i class="material-icons">details</i>
+        </a>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I work in the </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Work" matInput
+            [formControl]="selectWork"
+            [matAutocomplete]="work">
+          <mat-autocomplete #work="matAutocomplete">
+            <mat-option *ngFor="let option of filteredWork | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <span class="text-line">ward.</span>
+        <a [routerLink]="['/details']">
+          <i class="material-icons">details</i>
+        </a>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">I usually travel by </span>
+        <mat-form-field class="text-form">
+          <input type="text" aria-label="Work" matInput
+            [formControl]="selectTravel"
+            [matAutocomplete]="travel">
+          <mat-autocomplete #travel="matAutocomplete">
+            <mat-option *ngFor="let option of filteredTravel | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <a [routerLink]="['/details']">
+          <i class="material-icons">details</i>
+        </a>
+      </div>
+
+    </form>
+
+    <div class="padding" fxFlex fxLayout="column">
+
+      <span class="text-line">In the last 90 days...</span>
+
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.robbery">
+        <span class="text-line">{{ crimeList.robbery }} </span>
+        <span class="text-line">people got robbed</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
+        <span class="text-line">{{ crimeList.shoplifting }} </span>
+        <span class="text-line">reports of shoplifting</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap" *ngIf="crimeList.asbo">
+        <span class="text-line">{{ crimeList.asbo }} </span>
+        <span class="text-line">reports of Anti Social Behaviour</span>
+      </div>
+
+      <div class="form-row" fxLayout="row wrap">
+        <span class="text-line">ADD MORE</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pane" fxFlex="50">
+    <app-leaflet></app-leaflet>
+  </div>
+</div>
