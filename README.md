@@ -28,7 +28,6 @@ Follow instructions on the [Node.js](https://nodejs.org/en/download/package-mana
 ### MongoDB (Will be moved online at a later stage)
 Follow instructions on the [MongoDB](https://docs.mongodb.com/manual/installation/) website.
 
-
 ## Development server
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.8.
 

@@ -177,6 +177,10 @@
   dependencies:
     tslib "^1.7.1"
 
+"@asymmetrik/ngx-leaflet-markercluster@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet-markercluster/-/ngx-leaflet-markercluster-1.0.0.tgz#7bc11a4aa9275afb7a07239ceb443fc6c2fbc729"
+
 "@asymmetrik/ngx-leaflet@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@asymmetrik/ngx-leaflet/-/ngx-leaflet-3.0.2.tgz#02c1a9e4a8e78bee31d6cef5708d8b48886d2dfa"
@@ -4243,6 +4247,10 @@ geojson-equality@0.1.6:
   dependencies:
     deep-equal "^1.0.0"
 
+geojson-random@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/geojson-random/-/geojson-random-0.2.2.tgz#ab4838f126adc5e16f8f94e655def820f9119dbc"
+
 geojson-rbush@2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/geojson-rbush/-/geojson-rbush-2.1.0.tgz#3bd73be391fc10b0ae693d9b8acea2aae0b83a8d"
@@ -5401,6 +5409,10 @@ lcid@^1.0.0:
   resolved "https://registry.yarnpkg.com/lcid/-/lcid-1.0.0.tgz#308accafa0bc483a3867b4b6f2b9506251d1b835"
   dependencies:
     invert-kv "^1.0.0"
+
+leaflet.markercluster@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/leaflet.markercluster/-/leaflet.markercluster-1.3.0.tgz#58eb0654e90bd3274a660390ab0bc734212b204d"
 
 leaflet@^1.3.1:
   version "1.3.1"
@@ -6839,6 +6851,15 @@ querystringify@~1.0.0:
 quickselect@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/quickselect/-/quickselect-1.0.1.tgz#1e6ceaa9db1ca7c75aafcc863c7bef2037ca62a1"
+
+random-points-on-polygon@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/random-points-on-polygon/-/random-points-on-polygon-0.0.4.tgz#eaf3192253359f32a518a5c876d6e8e668f00acf"
+  dependencies:
+    turf-extent "^1.0.4"
+    turf-featurecollection "^1.0.1"
+    turf-inside "^1.1.4"
+    turf-random "^1.0.2"
 
 randomatic@^1.1.3:
   version "1.1.7"
@@ -8323,9 +8344,35 @@ tunnel-agent@~0.4.1:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.4.3.tgz#6373db76909fe570e08d73583365ed828a74eeeb"
 
+turf-extent@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/turf-extent/-/turf-extent-1.0.4.tgz#9f28ce11af916ada88862a062074658ba3fe0f01"
+  dependencies:
+    turf-meta "^1.0.2"
+
+turf-featurecollection@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/turf-featurecollection/-/turf-featurecollection-1.0.1.tgz#eccd1cf9124176bfc6db197cbb45d6de55f724c5"
+
+turf-inside@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/turf-inside/-/turf-inside-1.1.4.tgz#9a980bd113595c04826459ca6adffdaa79553fb1"
+  dependencies:
+    minimist "^1.1.0"
+
 turf-jsts@*:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/turf-jsts/-/turf-jsts-1.2.3.tgz#59757f542afbff9a577bbf411f183b8f48d38aa4"
+
+turf-meta@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/turf-meta/-/turf-meta-1.0.2.tgz#74d4c495938eb24772a70b31a157ee3d4fd6ba1b"
+
+turf-random@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/turf-random/-/turf-random-1.0.2.tgz#398632082086eb62b56f78e66777675f5720c263"
+  dependencies:
+    geojson-random "^0.2.2"
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"

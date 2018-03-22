@@ -20,6 +20,7 @@ import { DataService }              from './services/data.service';
 import { RadialComponent } from './details/radial/radial.component';
 import { StreamComponent } from './details/stream/stream.component';
 import { RadarComponent } from './details/radar/radar.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { RadarComponent } from './details/radar/radar.component';
     RadialComponent,
     StreamComponent,
     RadarComponent,
+    HomeComponent,
   ],
   imports: [
     AppMaterialModule,

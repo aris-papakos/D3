@@ -1,7 +1,114 @@
 <div class="container" fxLayout="row">
-  <div class="pane padding" fxLayout="column" fxFlex>
+  <div class="pane" fxLayout="column" fxFlex>
 
-    <form fxFlex fxLayout="column">
+    <div class="header" fxLayout="row" fxLayoutAlign="start center">
+      <span>Create your own system</span>
+      <span fxFlex></span>
+      <button
+        mat-button mat-mini-fab color="primary" matTooltip="Add a new area"
+        (click)="addLocation()">
+        <i class="material-icons">add</i>
+      </button>
+
+    </div>
+
+    <div class="system" fxFlex fxLayout="column">
+
+      <form [formGroup]="formGroup" novalidate>
+
+        <div class="segment-small" fxLayout="column" >
+
+          <div class="card-header" fxLayout="row">
+            <span>Mode of transportation</span>
+            <span fxFlex></span>
+          </div>
+
+          <mat-form-field class="full-width">
+            <mat-select placeholder="Preferred mode of transportation" formControlName="transportation">
+              <mat-option *ngFor="let mode of modeNames" [value]="mode">
+                {{ mode }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </div>
+
+
+        <div formArrayName="locations">
+          <div class="segment" fxLayout="row" *ngFor="let location of formGroup.controls.locations.controls; let i=index">
+
+            <div class="area" fxLayout="column">
+
+              <div class="card-header" fxLayout="row">
+                <span>Area Settings</span>
+                <span fxFlex></span>
+              </div>
+
+              <div [formGroupName]="i">
+                <mat-form-field class="full-width">
+                  <input matInput formControlName="label" placeholder="Label">
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <mat-select formControlName="type" placeholder="Area type">
+                    <mat-option *ngFor="let type of locationTypes" [value]="type.value">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="text-form">
+                  <input type="text" aria-label="Home" matInput
+                    placeholder="Search for a ward"
+                    formControlName="ward"
+                    [matAutocomplete]="home">
+                  <mat-autocomplete #home="matAutocomplete">
+                    <mat-option *ngFor="let option of filters[i] | async" [value]="option">
+                      {{ option }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+
+            </div>
+
+            <div class="connections" fxFlex fxLayout="column">
+
+              <div class="card-header" fxLayout="row">
+                Info
+              </div>
+
+              <div fxFlex fxLayoutAlign="center center" *ngIf="showSpinner(i)">
+                <mat-spinner class="spinner" [diameter]="20"></mat-spinner>
+              </div>
+
+              <div class="info-container" fxFlex fxLayout="column">
+
+              </div>
+
+              <div class="actions" fxLayout="row" fxLayoutAlign="end center">
+                <button
+                  mat-button mat-mini-fab color="primary" matTooltip="Show area details"
+                  (click)="showDetails(i)">
+                  <i class="material-icons">remove_red_eye</i>
+                </button>
+                <button
+                  mat-button mat-mini-fab color="primary" matTooltip="Remove this area"
+                  (click)="removeLocation(i)">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+
+            </div>
+
+
+          </div>
+        </div>
+      </form>
+
+    </div>
+
+    <!-- <form class="padding" fxFlex fxLayout="column">
 
       <div class="form-row" fxLayout="row wrap">
         <span class="text-line">I live in the </span>
@@ -56,9 +163,9 @@
         </a>
       </div>
 
-    </form>
+    </form> -->
 
-    <div class="padding" fxFlex fxLayout="column">
+    <!-- <div class="padding" fxFlex fxLayout="column">
 
       <span class="text-line">In the last 90 days...</span>
 
@@ -80,7 +187,7 @@
       <div class="form-row" fxLayout="row wrap">
         <span class="text-line">ADD MORE</span>
       </div>
-    </div>
+    </div> -->
 
   </div>
 

@@ -1,0 +1,21 @@
+.banner {
+  margin-bottom: 30px;
+}
+
+.banner {
+  text-align: center;
+}
+
+.banner .title {
+  font-size: 48px;
+  color: #571FB5;
+}
+
+.banner .subtitle {
+  font-size: 20px;
+  font-style: italic;
+}
+
+.about {
+  width: 1024px;
+}

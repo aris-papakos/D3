@@ -1,6 +1,6 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit, Input,
-  OnChanges, SimpleChanges }        from '@angular/core';
+  OnInit, Input, OnChanges,
+  SimpleChange, SimpleChanges }     from '@angular/core';
 import { ActivatedRoute }           from '@angular/router';
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
@@ -11,7 +11,7 @@ import { DataService }              from '../../services/data.service';
   templateUrl: './stream.component.html',
   styleUrls: ['./stream.component.css']
 })
-export class StreamComponent implements OnInit, AfterViewInit {
+export class StreamComponent implements OnInit, OnChanges {
 
   @Input() graphInput: any;
 
@@ -41,7 +41,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
     this.d3.select('.stream').select('svg').remove();
     let sortedGraphData = graphInput.currentValue.sort(function(a, b) {
       a = new Date(a['date']['dateString']);
-      b = new Date(b['date']['dateString')];
+      b = new Date(b['date']['dateString']);
       return a>b ? -1 : a<b ? 1 : 0;
     });
 

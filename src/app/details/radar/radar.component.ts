@@ -1,18 +1,17 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit, Input,
-  OnChanges, SimpleChanges }        from '@angular/core';
+  OnInit, Input, OnChanges,
+  SimpleChange, SimpleChanges }     from '@angular/core';
 import { ActivatedRoute }           from '@angular/router'
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
-
 
 @Component({
   selector: 'app-radar',
   templateUrl: './radar.component.html',
   styleUrls: ['./radar.component.css']
 })
-export class RadarComponent implements OnInit, AfterViewInit {
+export class RadarComponent implements OnInit, OnChanges {
 
   @Input() graphInput: any;
 

@@ -5,6 +5,8 @@ import { Observable }               from 'rxjs/Rx';
 import { Subject }                  from 'rxjs/Subject';
 
 import * as L                       from 'leaflet';
+import * as turf                    from '@turf/turf';
+import * as randomPoint             from 'random-points-on-polygon'
 
 
 @Component({
@@ -37,22 +39,50 @@ export class LeafletComponent implements OnInit {
   // COLLECTIONS
   wards = {};
 
+  colors = {
+    "Anti-social behaviour": "#ffffd9",
+    "Bicycle theft": "#edf8b1",
+    "Burglary": "#c7e9b4",
+    "Criminal damage and arson": "#7fcdbb",
+    "Drugs": "#41b6c4",
+    "Other crime": "#1d91c0",
+    "Other theft": "#225ea8",
+    "Possession of weapons": "#253494",
+    "Public order": "#081d58",
+    "Robbery": "#ffffd9",
+    "Shoplifting": "#edf8b1",
+    "Theft from the person": "#c7e9b4",
+    "Vehicle crime": "#7fcdbb",
+    "Violence and sexual offences": "#41b6c4"
+  };
+
   constructor(private dataService: DataService, private changeDetector: ChangeDetectorRef) {
     dataService.features$.takeWhile(() => this.alive).subscribe(features=> {
 
-      let combinedLayer = L.geoJSON()
+      let combinedLayer = L.geoJSON();
+      let colors = this.colors;
 
       for (let x in features) {
         let layer = L.geoJSON(features[x], {
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-              radius: 8,
-              fillColor: "#ff7800",
-              color: "#000",
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8
-            });
+          onEachFeature: function(feature) {
+            let point = turf.point(feature.geometry.coordinates);
+            let buffered = turf.buffer(point, 0.15);
+
+            feature.properties.crimes.forEach(function(crime) {
+              let random = randomPoint(1, buffered);
+              let position = L.latLng(random[0].geometry.coordinates[1], random[0].geometry.coordinates[0])
+
+              let marker =  L.circleMarker(position, {
+                  radius: 3,
+                  fillColor: colors[crime.crimeType],
+                  color: colors[crime.crimeType],
+                  weight: 0,
+                  opacity: 1,
+                  fillOpacity: 0.8
+                });
+
+              marker.addTo(combinedLayer);
+            })
           }
         });
 

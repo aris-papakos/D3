@@ -1,8 +1,7 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit, Input,
-  OnChanges, SimpleChanges }        from '@angular/core';
+  OnInit, Input, OnChanges,
+  SimpleChange, SimpleChanges }     from '@angular/core';
 import { ActivatedRoute }           from '@angular/router';
-
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
 import { DataService }              from '../../services/data.service';
@@ -12,7 +11,7 @@ import { DataService }              from '../../services/data.service';
   templateUrl: './radial.component.html',
   styleUrls: ['./radial.component.css']
 })
-export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
+export class RadialComponent implements OnInit, OnChanges {
 
   @Input() graphInput: any;
 
