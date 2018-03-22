@@ -182,7 +182,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
       //   .call(params.axis.y);
       // create y axis right
       this.append("g")
-        .classed("y axis2", true);
+        .classed("y axis2", true)
       //   .attr('transform', 'translate('+width+','+20+')')
       //   .call(params.axis.y2);
      //label of x axis
@@ -191,15 +191,15 @@ export class StreamComponent implements OnInit, AfterViewInit {
         .style("fill","black")
         .classed("x axis-label", true)
         .style("text-anchor", "middle")
-        .attr("transform", "translate("+-10+"," + height/1.8 +  ") rotate(-90)")
-     		.text("Crimes")
-        .style("font-size", "20px");
+        .attr("transform", "translate(" + width/1.9 + "," + 48 + ")")
+        .text("Crimes per Month - Area of Interest");
       this.select(".axis.y")
         .append("text")
         .style("fill","black")
         .classed("y axis-label", true)
-        .attr("transform", "translate(" + -56 + "," + height/4 +  ") rotate(-90)")
-        .text("Number of Crimes")
+        .attr("transform", "translate("+-10+"," + height/1.8 +  ") rotate(-90)")
+     		.text("Crimes")
+        .style("font-size", "20px");
       this.append("g")
         .append("text")
         .classed("chart-header",true)
