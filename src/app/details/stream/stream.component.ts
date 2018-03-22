@@ -170,6 +170,16 @@ export class StreamComponent implements OnInit, AfterViewInit {
 /////////////////////////////////////////////////////////////////////////////
 
     function drawAxis(params){
+
+      //plot axis2
+      this.append("text")
+                  .classed("title", true)
+                  .style("fill","black")
+                  .attr("transform","translate("+width/3.5+","+-20+")")
+                  .text("Mouse-over to Explore Crimes Streamgraph")
+                  .style("font-size", "20px");
+
+
       // create x axis
       this.append("g")
         .classed("axis x", true)
@@ -231,6 +241,8 @@ export class StreamComponent implements OnInit, AfterViewInit {
         let invertedDate = MONTH_NAMES[invertedx.getMonth()] +'-'+ invertedx.getFullYear();
         var selected = (d.values);
         var str = d.key+': '+amount_of_crimes+','+'   '+'Date:  '+ invertedDate;
+        d3.select(".title")
+                        .text("");
         d3.select(".chart-header")
           .text(str);
         d3.select(this)
