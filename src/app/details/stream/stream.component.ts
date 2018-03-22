@@ -71,7 +71,7 @@ export class StreamComponent implements OnInit, AfterViewInit {
 
     var z= d3.scaleOrdinal(d3.schemeYlGnBu[9]);
     var x = d3.scaleTime().range([0,width-5]);
-    var y = d3.scaleLinear().range([height/1.2,0]);
+    var y = d3.scaleLinear().range([height/1.22,0]);
 
     var xAxis = d3.axisBottom(x)
       .scale(x)
@@ -175,24 +175,25 @@ export class StreamComponent implements OnInit, AfterViewInit {
         .classed("axis x", true)
         .attr('transform', 'translate(0,'+height+')')
         .call(params.axis.x);
-      // create y axis left
-      this.append("g")
-        .classed("axis y", true)
-        .attr('transform', 'translate('+-5+','+20+')')
-        .call(params.axis.y);
+      // // create y axis left
+      // this.append("g")
+      //   .classed("axis y", true)
+      //   .attr('transform', 'translate('+-5+','+20+')')
+      //   .call(params.axis.y);
       // create y axis right
       this.append("g")
-        .classed("y axis2", true)
-        .attr('transform', 'translate('+width+','+20+')')
-        .call(params.axis.y2);
+        .classed("y axis2", true);
+      //   .attr('transform', 'translate('+width+','+20+')')
+      //   .call(params.axis.y2);
      //label of x axis
       this.select(".axis.x")
         .append("text")
         .style("fill","black")
         .classed("x axis-label", true)
         .style("text-anchor", "middle")
-        .attr("transform", "translate(" + width/1.9 + "," + 48 + ")")
-        .text("Monthly Streaming Crimes of London");
+        .attr("transform", "translate("+-10+"," + height/1.8 +  ") rotate(-90)")
+     		.text("Crimes")
+        .style("font-size", "20px");
       this.select(".axis.y")
         .append("text")
         .style("fill","black")
