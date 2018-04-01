@@ -76,7 +76,7 @@ export class DetailsComponent implements OnInit {
 
     this.route.params.subscribe(params => {
       // if (!this.dataService.featuresRaw[params.area]) {
-        this.dataService.getCrime(params.area)
+        this.dataService.getCrime(params.area, false)
           .subscribe(data => {
             this.featureCollection[params.area] = data;
             this.dataService.setFeatures(this.featureCollection);
@@ -86,7 +86,7 @@ export class DetailsComponent implements OnInit {
 
             let layer = L.geoJSON(this.featureCollection[params.area], {
               onEachFeature: function(feature) {
-                let point = turf.point(feature.geometry.coordinates);
+                let point = turf.point(feature['geometry']['coordinates']);
                 let buffered = turf.buffer(point, 0.15);
 
                 feature.properties.crimes.forEach(function(crime) {

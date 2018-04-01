@@ -36,6 +36,7 @@ export class DashboardComponent implements OnInit {
     shoplifting                       : 0,
     robbery                           : 0,
   }
+  routePairs                        = [];
 
   transportation = null;
   segments                          = [];
@@ -85,11 +86,23 @@ export class DashboardComponent implements OnInit {
     .debounceTime(500)
     .subscribe(value => {
       this.transportation = value;
+
+      if (this.transportation != null && this.routePairs.length > 0) {
+        this.featureCollection.routes = []
+
+        for (let n = 0; n < this.routePairs.length; n++ ) {
+          this.dataService.getRoute(this.transportation, this.routePairs[n][0], this.routePairs[n][1])
+          .subscribe(data => {
+            this.featureCollection.routes.push(data);
+            this.dataService.setFeatures(this.featureCollection);
+          });
+        }
+      }
     });
   }
 
   initLocation(i: number) {
-    this.filters[i] = new Observable<string[]>;
+    // this.filters[i] = new Observable<string[]>;
     this.segments[i] = { 'label': null, 'type': null, 'ward': '', 'loading': false }
 
     let group = this.fb.group({
@@ -104,56 +117,38 @@ export class DashboardComponent implements OnInit {
       this.segments[i].label = value;
     });
 
-    group.get('type').valueChanges
-    .debounceTime(500)
-    .subscribe(value => {
-      this.segments[i].type = value;
-    });
-
     group.get('ward').valueChanges
     .debounceTime(500)
     .subscribe(value => {
       if (this.wardNames.indexOf(value) > -1) {
         this.segments[i].loading = true;
         this.segments[i].ward = value;
-        this.dataService.getCrime(value)
+        this.dataService.getCrime(value, true)
           .subscribe(data => {
             this.segments[i].loading = false;
             this.featureCollection.areas[i] = data;
             this.dataService.setFeatures(this.featureCollection);
           });
 
-        // var _pairs = [];
-        // for (let o = 0; o < this.segments.length; o++){
-        //   let selectedNow = this.segments[o].ward;
-        //
-        //   for (let j = 0; j < this.segments.length;j++){
-        //
-        //     if (selectedNow == this.segments[j].ward) {/*ignore*/ }
-        //
-        //     else {
-        //       let combination = [selectedNow, this.segments[j].ward];
-        //
-        //       if (_pairs.indexOf(combination) == -1 && _pairs.indexOf([combination[1], combination[0]]) == -1) {
-        //         _pairs.push(combination);
-        //       }
-        //     }
-        //   }
-        // }
+          this.routePairs = [];
 
-        // console.log(_pairs)
+          let n = this.segments.length;
+          for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++){
+              this.routePairs.push([this.segments[i].ward, this.segments[j].ward])
+            }
+          }
 
-        // if (this.transportation != null && _pairs.length > 0) {
-        //
-        //   for (let n = 0; n < _pairs.length; n++ ) {
-        //     this.dataService.getRoute(this.transportation, _pairs[n][0], _pairs[n][1])
-        //     .subscribe(data => {
-        //       this.featureCollection.routes = []
-        //       this.featureCollection.routes.push(data);
-        //       // this.dataService.setFeatures(this.featureCollection);
-        //     });
-        //   }
-        // }
+        this.featureCollection.routes = []
+        if (this.transportation != null && this.routePairs.length > 0) {
+          for (let n = 0; n < this.routePairs.length; n++ ) {
+            this.dataService.getRoute(this.transportation, this.routePairs[n][0], this.routePairs[n][1])
+            .subscribe(data => {
+              this.featureCollection.routes.push(data);
+              this.dataService.setFeatures(this.featureCollection);
+            });
+          }
+        }
       }
     });
 
@@ -174,7 +169,31 @@ export class DashboardComponent implements OnInit {
   removeLocation(i: number) {
     let control = <FormArray>this.formGroup.controls['locations'];
     control.removeAt(i);
-    this.featureCollection.area.removeAt(i)
+
+    this.segments.splice(i, 1);
+    console.log(this.segments.length)
+    this.featureCollection.areas.splice(i, 1);
+    this.routePairs = [];
+
+    let n = this.segments.length;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++){
+        this.routePairs.push([this.segments[i].ward, this.segments[j].ward])
+      }
+    }
+
+    this.featureCollection.routes = []
+
+    if (this.transportation != null && this.routePairs.length > 0) {
+      for (let n = 0; n < this.routePairs.length; n++ ) {
+        this.dataService.getRoute(this.transportation, this.routePairs[n][0], this.routePairs[n][1])
+        .subscribe(data => {
+          this.featureCollection.routes.push(data);
+          this.dataService.setFeatures(this.featureCollection);
+        });
+      }
+    }
+
     this.dataService.setFeatures(this.featureCollection);
   }
 

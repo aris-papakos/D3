@@ -19,15 +19,20 @@ module.exports = (function() {
       .exec(function(err, ward) {
         if (err) console.error(err);
 
-        var date = new Date()
-        date = date.setDate(date.getDate() - 90);
+        let populate = { path: 'properties.crimes' }
+
+        if (req.query.sample == true) {
+          let date = new Date('2017-01-01')
+          // populate['match'] = { 'date.dateString': { '$gte': date } }
+          populate['options'] = {
+            limit: 5
+          }
+        }
 
         Location.find({
            'geometry': { $geoWithin: { $geometry: ward.geometry } }
         })
-        .populate({
-          path: 'properties.crimes',
-        })
+        .populate(populate)
         .exec(function(err, location) {
           if (err) console.error(err);
 
@@ -38,25 +43,27 @@ module.exports = (function() {
       });
     },
     getRoute: function(req, res, next) {
-      console.log(req.query);
+      let start, end;
 
       async.parallel([
         function(callback) {
-          Ward.findOne({ 'properties.name': req.query.home })
+          Ward.findOne({ 'properties.name': req.query.start })
           .exec(function(err, ward) {
             if (err) console.error(err);
 
-            let homeCentroid = turf.centroid(turf.polygon(ward.geometry.coordinates));
-            callback(null, homeCentroid)
+            start = ward;
+            let startCentroid = turf.centroid(turf.polygon(ward.geometry.coordinates));
+            callback(null, startCentroid)
           });
         },
         function(callback) {
-          Ward.findOne({ 'properties.name': req.query.work })
+          Ward.findOne({ 'properties.name': req.query.end })
           .exec(function(err, ward) {
             if (err) console.error(err);
 
-            let workCentroid = turf.centroid(turf.polygon(ward.geometry.coordinates));
-            callback(null, workCentroid)
+            end = ward;
+            let endCentroid = turf.centroid(turf.polygon(ward.geometry.coordinates));
+            callback(null, endCentroid)
           });
         }
       ], function(err, result) {
@@ -100,13 +107,28 @@ module.exports = (function() {
               if (error) console.error(err);
 
               var polyline = turf.lineString(routeFeature.geometry.coordinates);
-              var buffered = turf.buffer(polyline, 1);
+              var buffered = turf.buffer(polyline, 0.25);
 
-              var date = new Date()
-              date = date.setDate(date.getDate() - 90);
+              let date = new Date('2017-01-01')
 
-              Location.find({ 'geometry': { $geoWithin: { $geometry: buffered.geometry } } })
+              let populate = {
+                path: 'properties.crimes',
+                // match: { 'date.dateString': { '$gte': date } },
+                options: {
+                  limit: 3
+                }
+              }
 
+              Location.find({
+                $and: [
+                  { 'geometry': { $geoWithin: { $geometry: buffered.geometry } } },
+                  { 'geometry': { $not: { $geoWithin: { $geometry: start.geometry } } } },
+                  { 'geometry': { $not: { $geoWithin: { $geometry: end.geometry } } } }
+                ]
+              }
+
+              )
+              .populate(populate)
               .exec(function(err, location) {
                 if (err) console.error(err);
 

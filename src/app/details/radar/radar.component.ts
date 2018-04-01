@@ -1,6 +1,6 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit, Input,
-  OnChanges, SimpleChanges }        from '@angular/core';
+  OnInit, Input,OnChanges,
+  SimpleChange, SimpleChanges }     from '@angular/core';
 import { ActivatedRoute }           from '@angular/router'
 
 import { D3Service, D3, Selection } from 'd3-ng2-service';
@@ -12,7 +12,7 @@ import { DataService }              from '../../services/data.service';
   templateUrl: './radar.component.html',
   styleUrls: ['./radar.component.css']
 })
-export class RadarComponent implements OnInit, AfterViewInit {
+export class RadarComponent implements OnInit {
 
   @Input() graphInput: any;
 
@@ -80,6 +80,8 @@ export class RadarComponent implements OnInit, AfterViewInit {
 			.key(function(d:any) { return d['crimeType']; })
 			.rollup(function(v:any) { return +d3.format(".2f")( v.length / total);})
 			.entries(graphData);
+
+      console.log(data)
 
 			//Average crime data of London (Dummy Data)
 		var londonAVG = [//London Average
@@ -189,12 +191,10 @@ export class RadarComponent implements OnInit, AfterViewInit {
 
     let color:any = d3.scaleOrdinal(["rgba(40, 181, 196, 0.5)","rgba(35, 0, 89, 0.5)"])	//Color function
 
-
-
   	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
   	var maxValue = Math.ceil(
       (Math.max(cfg['maxValue'], d3.max(data, function(i:any) {
-        return d3.max(i.map(function(o){
+        return d3.max(i.map(function(o:any){
           return o.value;
         }));
       })) * 10)) / 10;

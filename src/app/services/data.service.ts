@@ -27,9 +27,9 @@ export class DataService {
     });
   }
 
-  getCrime(ward: any): Observable<any> {
+  getCrime(ward: any, sample: boolean): Observable<any> {
     return this.http.get('http://localhost:3000/api/crime/getWard', {
-      params: { ward: ward }
+      params: { ward: ward, sample: sample }
     })
     .map((res:any) => res.json())
     .catch((error:any) => {
@@ -37,9 +37,9 @@ export class DataService {
     });
   }
 
-  getRoute(mode: string, home: any, work: any): Observable<any> {
+  getRoute(mode: string, start: any, end: any): Observable<any> {
     return this.http.get('http://localhost:3000/api/crime/getRoute', {
-      params: { mode: mode, home: home, work: work }
+      params: { mode: mode, start: start, end: end }
     })
     .map((res:any) => res.json())
     .catch((error:any) => {

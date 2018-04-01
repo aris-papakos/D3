@@ -61,15 +61,18 @@ export class LeafletComponent implements OnInit {
 
       let combinedLayer = L.geoJSON();
       let colors = this.colors;
+      let count = 0;
 
       for (let i in features) {
         for (let x in features[i]) {
           let layer = L.geoJSON(features[i][x], {
             onEachFeature: function(feature) {
-              let point = turf.point(feature.geometry.coordinates);
+              let point = turf.point(feature['geometry']['coordinates']);
               let buffered = turf.buffer(point, 0.15);
 
               feature.properties.crimes.forEach(function(crime) {
+                count++
+
                 let random = randomPoint(1, buffered);
                 let position = L.latLng(random[0].geometry.coordinates[1], random[0].geometry.coordinates[0])
 
@@ -94,6 +97,7 @@ export class LeafletComponent implements OnInit {
       this.crimeLayer.clearLayers();
       combinedLayer.addTo(this.crimeLayer);
       this.fitBounds = this.crimeLayer.getBounds();
+      console.log(count)
     });
 
   }

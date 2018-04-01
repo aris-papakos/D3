@@ -1,6 +1,6 @@
 import { Component, ElementRef,
-  OnInit, AfterViewInit, Input,
-  OnChanges, SimpleChanges }        from '@angular/core';
+  OnInit, Input, OnChanges,
+  SimpleChange, SimpleChanges }     from '@angular/core';
 import { ActivatedRoute }           from '@angular/router';
 
 
@@ -12,7 +12,7 @@ import { DataService }              from '../../services/data.service';
   templateUrl: './radial.component.html',
   styleUrls: ['./radial.component.css']
 })
-export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
+export class RadialComponent implements OnInit, OnChanges {
 
   @Input() graphInput: any;
 
@@ -205,4 +205,4 @@ export class RadialComponent implements OnInit, AfterViewInit, OnChanges {
       .style("font-size",14);
   }
 
-} 
+}
